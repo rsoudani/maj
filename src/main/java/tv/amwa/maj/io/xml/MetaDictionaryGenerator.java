@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 
@@ -72,6 +73,7 @@ import tv.amwa.maj.record.AUID;
  * 
  * @see XSDGenerator
  */
+@Slf4j
 public class MetaDictionaryGenerator 
 	implements CommonConstants {
 
@@ -496,6 +498,6 @@ public class MetaDictionaryGenerator
 	public final static void main(
 			String args[]) {
 
-		System.out.println(generateBaselineDictionaryAsAString());
+		log.info(generateBaselineDictionaryAsAString());
 	}
 }

@@ -63,6 +63,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Vector;
 
+import lombok.extern.slf4j.Slf4j;
 import tv.amwa.maj.exception.EndOfDataException;
 import tv.amwa.maj.exception.IllegalPropertyValueException;
 import tv.amwa.maj.exception.InsufficientSpaceException;
@@ -89,6 +90,7 @@ import tv.amwa.maj.record.impl.AUIDImpl;
  *
  *
  */
+@Slf4j
 @HiddenClass
 public abstract class TypeDefinitionObjectReferenceImpl 
 	extends 
@@ -171,7 +173,7 @@ public abstract class TypeDefinitionObjectReferenceImpl
 		public int hashCode() {
 			
 			if (value == null) {
-				System.err.println("Asked for a null hashcode.");
+				log.warn("Asked for a null hashcode.");
 				return 0;
 			}
 			else

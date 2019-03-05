@@ -40,6 +40,7 @@ package tv.amwa.maj.io.mxf;
 
 import java.nio.ByteBuffer;
 
+import lombok.extern.slf4j.Slf4j;
 import tv.amwa.maj.integer.Int32;
 import tv.amwa.maj.integer.Int64;
 import tv.amwa.maj.integer.UInt32;
@@ -52,6 +53,7 @@ import tv.amwa.maj.io.mxf.impl.MXFFileImpl;
  *
  *
  */
+@Slf4j
 public class KLVObject {
 
 	public enum KeyFormat {
@@ -714,7 +716,7 @@ public class KLVObject {
 		if ((size > 0) && (size < bytesToWrite)) bytesToWrite = size;
 		
 		if (bytesToWrite > Integer.MAX_VALUE) {
-			System.err.println("Tried to write > 2GBs and this platform can only handle <= 2Gb chunks.");
+			log.warn("Tried to write > 2GBs and this platform can only handle <= 2Gb chunks.");
 			return 0;
 		}
 		

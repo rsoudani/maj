@@ -55,6 +55,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import lombok.extern.slf4j.Slf4j;
 import tv.amwa.maj.enumeration.ByteOrder;
 import tv.amwa.maj.exception.EndOfDataException;
 import tv.amwa.maj.industry.MemoryResidentStream;
@@ -73,6 +74,7 @@ import tv.amwa.maj.meta.TypeDefinitionWeakObjectReference;
 import tv.amwa.maj.record.AUID;
 import tv.amwa.maj.record.impl.AUIDImpl;
 
+@Slf4j
 public class ResolutionEntry {
 
 	private PropertyDefinition property;
@@ -142,7 +144,7 @@ public class ResolutionEntry {
 			if (reference instanceof AUID)
 				referenceID = (AUID) reference;
 			else {
-				System.err.println("Unexpected " + reference.getClass().getName() + " reference value for weak reference " +
+				log.warn("Unexpected " + reference.getClass().getName() + " reference value for weak reference " +
 						"property " + property.getMemberOf().getName() + "." + property.getName() + ".");
 				break;
 			}
@@ -158,7 +160,7 @@ public class ResolutionEntry {
 				injectionPoint.set(target, weakReference);
 			}
 			catch (Exception e) {
-				System.err.println("Could not inject a value into property " + property.getName() + ".");
+				log.warn("Could not inject a value into property " + property.getName() + ".");
 				property.setPropertyValue(target, propertyType.createValue(weakReference.getTarget()));
 			}
 			break;
@@ -168,7 +170,7 @@ public class ResolutionEntry {
 			if (reference instanceof String)
 				referenceTarget = pathMap.get(reference);
 			if (referenceTarget == null) {
-				System.err.println("Unable to resolve reference " + reference + " for property " + 
+				log.warn("Unable to resolve reference " + reference + " for property " +
 						property.getMemberOf().getName() + "." + property.getName());
 				break;
 			}
@@ -179,7 +181,7 @@ public class ResolutionEntry {
 				injectionPoint.set(target, referenceTarget);
 			}
 			catch (Exception e) {
-				System.err.println("Unable to use injection for property " + property.getName() + ".");
+				log.warn("Unable to use injection for property " + property.getName() + ".");
 //				if (!(target instanceof ApplicationObject))
 					property.setPropertyValue(target, propertyType.createValue(referenceTarget));
 			}
@@ -195,11 +197,11 @@ public class ResolutionEntry {
 			case StrongObjRef:
 				ByteBuffer arrayIndexBuffer = indexMap.get(arrayCollectionPath + " index");
 
-//				System.out.println("*** READING VARIABLE ARRAY INDEX ***");
+//				log.info("*** READING VARIABLE ARRAY INDEX ***");
 //				arrayIndexBuffer.rewind();
 //				while (arrayIndexBuffer.hasRemaining())
 //					System.out.print(Integer.toHexString(arrayIndexBuffer.get()) + " ");
-//				System.out.println();
+//				log.info();
 				arrayIndexBuffer.rewind();
 				
 				int entryCount = arrayIndexBuffer.getInt();
@@ -208,14 +210,14 @@ public class ResolutionEntry {
 				@SuppressWarnings("unused")
 				int lastFree = arrayIndexBuffer.getInt();
 				
-//				System.out.println("*** STRONG REFERENCE VECTOR: entryCount " + entryCount + " firstFree " + firstFree 
+//				log.info("*** STRONG REFERENCE VECTOR: entryCount " + entryCount + " firstFree " + firstFree
 //						+ " lastFree " + lastFree);
 				
 				List<MetadataObject> elements = new Vector<MetadataObject>(entryCount);
 				for ( int x = 0 ; x < entryCount ; x++ ) {
 //					String arrayElementPath = arrayCollectionPath + "{" + Integer.toHexString(x) + "}";
 					String arrayElementPath = arrayCollectionPath + "{" + Integer.toHexString(arrayIndexBuffer.getInt()) + "}";
-//					System.out.println(x + ": " + arrayElementPath);
+//					log.info(x + ": " + arrayElementPath);
 					elements.add(pathMap.get(arrayElementPath));
 					
 				}
@@ -226,18 +228,18 @@ public class ResolutionEntry {
 					injectionPoint.set(target, elements);
 				}
 				catch (Exception e) {
-					System.err.println("Unable to use injection for property " + property.getName() + ".");
+					log.warn("Unable to use injection for property " + property.getName() + ".");
 //					if (!(target instanceof ApplicationObject))
 						property.setPropertyValue(
 								target, 
 								propertyType.createValue(elements));
 				}
 
-//				System.out.println(target.toString());
+//				log.info(target.toString());
 				break;
 				
 			case WeakObjRef:
-//				System.out.println("Looking for index " + arrayCollectionPath + " index: " + 
+//				log.info("Looking for index " + arrayCollectionPath + " index: " +
 //						indexMap.containsKey(arrayCollectionPath + " index"));
 				ByteBuffer weakArrayIndexBuffer = indexMap.get(arrayCollectionPath + " index");
 				int weakEntryCount = weakArrayIndexBuffer.getInt();
@@ -247,21 +249,21 @@ public class ResolutionEntry {
 				short identificationPid = weakArrayIndexBuffer.getShort();
 				@SuppressWarnings("unused")
 				byte identificationSize = weakArrayIndexBuffer.get();
-//				System.out.println("*** WEAK REFERENCE VECTOR: Array entry count = " + weakEntryCount + 
+//				log.info("*** WEAK REFERENCE VECTOR: Array entry count = " + weakEntryCount +
 //						", indentificationPid = " + identificationPid + ", " +
 //						"identificationSize = " + identificationSize);
 				WeakReferenceVector<WeakReferenceTarget> weakArray = new WeakReferenceVector<WeakReferenceTarget>();
 				for ( int x = 0 ; x < weakEntryCount ; x++ ) {
 					try {
 						AUID reference = AUIDImpl.createFromBuffer(weakArrayIndexBuffer);
-//						System.out.println("Weak reference element " + x + ": " + reference.toString());
+//						log.info("Weak reference element " + x + ": " + reference.toString());
 						weakArray.append(new WeakReference(
 								((TypeDefinitionWeakObjectReference) 
 										arrayReferencedType).getObjectType().getJavaImplementation(),
 										reference));
 					}
 					catch (EndOfDataException eode) {
-						System.err.println("Error reading data from a weak reference vector.");
+						log.warn("Error reading data from a weak reference vector.");
 					}
 				}
 				
@@ -271,13 +273,13 @@ public class ResolutionEntry {
 					injectionPoint.set(target, weakArray);
 				}
 				catch (Exception e) {
-					System.err.println("Unable to use injection for property " + property.getName() + ".");
+					log.warn("Unable to use injection for property " + property.getName() + ".");
 					property.setPropertyValue(
 							target, 
 							propertyType.createValue(weakArray));
 				}
 
-				// System.out.println(target.toString());
+				// log.info(target.toString());
 				break;
 				
 			default:
@@ -304,7 +306,7 @@ public class ResolutionEntry {
 				short identificationPid = setIndexBuffer.getShort();
 				byte identificationSize = setIndexBuffer.get();
 				
-//				System.out.println("*** STRONG REFERENCE SET: entryCount " + entryCount + " firstFree " + firstFreeKey
+//				log.info("*** STRONG REFERENCE SET: entryCount " + entryCount + " firstFree " + firstFreeKey
 //						+ " lastFree " + lastFreeKey + " identificationPid " + Integer.toHexString(identificationPid) +
 //						" identificationSize " + identificationSize);
 				
@@ -317,12 +319,12 @@ public class ResolutionEntry {
 					setIndexBuffer.get(identification);
 					String setElementPath = setCollectionPath + "{" + Integer.toHexString(localKey) + "}";
 					setElements.add(pathMap.get(setElementPath));
-//					System.out.println("localKey " + localKey + " referenceCount " + referenceCount + ": " +
+//					log.info("localKey " + localKey + " referenceCount " + referenceCount + ": " +
 //							setElementPath);
 
 //					for ( int y = 0 ; y < identification.length ; y++ )
 //						System.out.print(Integer.toHexString(identification[y]) + " ");
-//					System.out.println();
+//					log.info();
 				}
 				
 				try {
@@ -331,25 +333,25 @@ public class ResolutionEntry {
 					injectionPoint.set(target, setElements);
 				}
 				catch (Exception e) {
-					System.err.println("Unable to use injection for property " + property.getName() + ".");
+					log.warn("Unable to use injection for property " + property.getName() + ".");
 					property.setPropertyValue(
 						target, 
 						propertyType.createValue(setElements));
 				}
 
-				// System.out.println(target.toString());
+				// log.info(target.toString());
 				break;
 				
 			case WeakObjRef:
-//				System.out.println("Looking for index " + setCollectionPath + " index: " + 
+//				log.info("Looking for index " + setCollectionPath + " index: " +
 //						indexMap.containsKey(setCollectionPath + " index"));
 				ByteBuffer weakArrayIndexBuffer = indexMap.get(setCollectionPath + " index");
 				
-//				System.out.println("*** READING INDEX ***");
+//				log.info("*** READING INDEX ***");
 //				weakArrayIndexBuffer.rewind();
 //				while (weakArrayIndexBuffer.hasRemaining())
 //					System.out.print(Integer.toHexString(weakArrayIndexBuffer.get()) + " ");
-//				System.out.println();
+//				log.info();
 //				weakArrayIndexBuffer.rewind();
 
 				int weakEntryCount = weakArrayIndexBuffer.getInt();
@@ -359,7 +361,7 @@ public class ResolutionEntry {
 				short weakIdentificationPid = weakArrayIndexBuffer.getShort();
 				@SuppressWarnings("unused")
 				byte weakIdentificationSize = weakArrayIndexBuffer.get();
-//				System.out.println("*** WEAK REFERENCE SET: Set entry count = " + weakEntryCount + 
+//				log.info("*** WEAK REFERENCE SET: Set entry count = " + weakEntryCount +
 //						" referencedPropertyTag " + referencedPropertyTag +
 //						" indentificationPid " + weakIdentificationPid +
 //						" identificationSize " + weakIdentificationSize);
@@ -367,14 +369,14 @@ public class ResolutionEntry {
 				for ( int x = 0 ; x < weakEntryCount ; x++ ) {
 					try {
 						AUID reference = AUIDImpl.createFromBuffer(weakArrayIndexBuffer);
-//						System.out.println("Weak reference element " + x + ": " + reference.toString());
+//						log.info("Weak reference element " + x + ": " + reference.toString());
 						weakSet.add(new WeakReference(
 								((TypeDefinitionWeakObjectReference) 
 										setReferencedType).getObjectType().getJavaImplementation(),
 										reference));
 					}
 					catch (EndOfDataException eode) {
-						System.err.println("Error reading data from a weak reference vector.");
+						log.warn("Error reading data from a weak reference vector.");
 					}
 				}
 				
@@ -384,13 +386,13 @@ public class ResolutionEntry {
 					injectionPoint.set(target, weakSet);
 				}
 				catch (Exception e) {
-					System.err.println("Unable to use injection for property " + property.getName() + ".");
+					log.warn("Unable to use injection for property " + property.getName() + ".");
 					property.setPropertyValue(
 						target, 
 						propertyType.createValue(weakSet));
 				}
 
-//				System.out.println(target.toString());
+//				log.info(target.toString());
 				break;
 				
 			default:
@@ -400,7 +402,7 @@ public class ResolutionEntry {
 			break;
 		
 		case Stream:
-//			System.out.println("Resolving stream " + reference.toString() + " for property " + property.getMemberOf().getName() + "." +
+//			log.info("Resolving stream " + reference.toString() + " for property " + property.getMemberOf().getName() + "." +
 //					property.getName() + ".");
 
 			Stream referencedStream = null;
@@ -410,19 +412,19 @@ public class ResolutionEntry {
 				((MemoryResidentStream) referencedStream).setByteOrder(byteOrder);
 			}
 			if (referencedStream == null) {
-				System.err.println("Unable to resolve stream reference " + reference + " for property " + 
+				log.warn("Unable to resolve stream reference " + reference + " for property " +
 						property.getMemberOf().getName() + "." + property.getName());
 				break;
 			}
 			
 			try {
-//				System.out.println("***: Resolving a stream. Hooray! Length is " + referencedStream.getLength());
+//				log.info("***: Resolving a stream. Hooray! Length is " + referencedStream.getLength());
 				Field injectionPoint = findInjectionPoint(property);
 				injectionPoint.setAccessible(true);
 				injectionPoint.set(target, referencedStream);
 			}
 			catch (Exception e) {
-				System.err.println("Unable to use injection for property " + property.getName() + ".");
+				log.warn("Unable to use injection for property " + property.getName() + ".");
 //				if (!(target instanceof ApplicationObject))
 					property.setPropertyValue(target, propertyType.createValue(referencedStream));
 			}
@@ -452,7 +454,7 @@ public class ResolutionEntry {
 		short identificationPid = setIndexBuffer.getShort();
 		byte identificationSize = setIndexBuffer.get();
 			
-//			System.out.println("*** STRONG REFERENCE SET: entryCount " + entryCount + " firstFree " + firstFreeKey
+//			log.info("*** STRONG REFERENCE SET: entryCount " + entryCount + " firstFree " + firstFreeKey
 //					+ " lastFree " + lastFreeKey + " identificationPid " + Integer.toHexString(identificationPid) +
 //					" identificationSize " + identificationSize);
 			
@@ -465,12 +467,12 @@ public class ResolutionEntry {
 			setIndexBuffer.get(identification);
 			String setElementPath = setCollectionPath + "{" + Integer.toHexString(localKey) + "}";
 			setElements.add(pathMap.get(setElementPath));
-//				System.out.println("localKey " + localKey + " referenceCount " + referenceCount + ": " +
+//				log.info("localKey " + localKey + " referenceCount " + referenceCount + ": " +
 //						setElementPath);
 
 //				for ( int y = 0 ; y < identification.length ; y++ )
 //					System.out.print(Integer.toHexString(identification[y]) + " ");
-//				System.out.println();
+//				log.info();
 		}
 			
 		try {
@@ -479,13 +481,13 @@ public class ResolutionEntry {
 			injectionPoint.set(target, setElements);
 		}
 		catch (Exception e) {
-			System.err.println("Could not inject a value into property " + property.getName() + ".");
+			log.warn("Could not inject a value into property " + property.getName() + ".");
 			property.setPropertyValue(
 				target, 
 				propertyType.createValue(setElements));
 		}
 
-			// System.out.println(target.toString());
+			// log.info(target.toString());
 	}
 
 	private final static Field findInjectionPoint(

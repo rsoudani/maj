@@ -209,7 +209,7 @@ public class TimeStructTest {
 		assertEquals((byte) 59, testTime.getFraction());
 
 		//Printed value will be according to local time zone
-		//System.out.println(testTime.toString());
+		//log.info(testTime.toString());
 	}
 	
 	@Test(expected=java.text.ParseException.class)

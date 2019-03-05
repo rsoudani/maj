@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -120,7 +121,7 @@ import tv.amwa.maj.record.impl.AUIDImpl;
 // TODO add support for streams
 // TODO investigate why multiple descriptors don't work
 // TODO work out what to do about portable objects ... like implement a mix in equivalent
-
+@Slf4j
 public class JPAGenerator {
 
 	private final static String ORM_NAMESPACE = "http://java.sun.com/xml/ns/persistence/orm";
@@ -451,7 +452,7 @@ public class JPAGenerator {
 						break;
 					}
 					default:
-						System.err.println("Not handling a variable array of type : " + propertyType.getName());
+						log.warn("Not handling a variable array of type : " + propertyType.getName());
 						break;
 					}
 					break;
@@ -476,18 +477,18 @@ public class JPAGenerator {
 					}
 					default:
 
-						System.err.println("Not handling a set of type : " + propertyType.getName());
+						log.warn("Not handling a set of type : " + propertyType.getName());
 						break;
 
 					}
 					break;
 				}
 				case FixedArray:
-					System.err.println("Not handling a fixed array type : " + propertyType.getName());
+					log.warn("Not handling a fixed array type : " + propertyType.getName());
 					break;
 
 				default:
-					System.err.println("Not handling a one-to-many for type : " + propertyType.getName());
+					log.warn("Not handling a one-to-many for type : " + propertyType.getName());
 					break;
 				}
 			}
@@ -543,7 +544,7 @@ public class JPAGenerator {
 					break;
 					}
 				default:
-					System.err.println("Not handling a one-to-one for type " + propertyType.getName());
+					log.warn("Not handling a one-to-one for type " + propertyType.getName());
 					break;
 				}
 			}
@@ -576,7 +577,7 @@ public class JPAGenerator {
 				        break;
 						}
 					default:
-						System.err.println("Not handling element collection fixed array for type : " + propertyType.getName());
+						log.warn("Not handling element collection fixed array for type : " + propertyType.getName());
 						break;
 					}
 					break;
@@ -603,7 +604,7 @@ public class JPAGenerator {
 					break;
 					}
 				default:
-					System.err.println("Not handling element collection for type : " + propertyType.getName());
+					log.warn("Not handling element collection for type : " + propertyType.getName());
 					break;
 				}
 			}
@@ -882,7 +883,7 @@ public class JPAGenerator {
 		long startTime = System.currentTimeMillis();
 		generateORM(mediaClassList, "/Users/vizigoth2/tools/apache-openjpa-2.0.1/examples/META-INF/orm.xml");
 		long endTime = System.currentTimeMillis();
-		System.out.println("JPA mapping file generated in " + (endTime - startTime) + ".");
+		log.info("JPA mapping file generated in " + (endTime - startTime) + ".");
 	}
 
 }

@@ -246,7 +246,7 @@ public abstract class TypeDefinitionImpl
 //		MethodBag makeMethodBag(Method getter, Method[] candidateMethods,
 //				String propertyName) {
 //
-//			System.err.println("Method bag creation called before types are fully resolved.");
+//			log.warn("Method bag creation called before types are fully resolved.");
 //			return null;
 //		}
 //
@@ -279,7 +279,7 @@ public abstract class TypeDefinitionImpl
 		/* }
 		catch (InvocationTargetException ite) {
 			
-			System.err.println(ite.getCause().getClass().getName() + ": " + ite.getCause().getMessage());
+			log.warn(ite.getCause().getClass().getName() + ": " + ite.getCause().getMessage());
 			throw ite;
 		} */
 	}

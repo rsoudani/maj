@@ -412,7 +412,7 @@ public final class TimeStampImpl
 		if ((lastDot == -1) && (stamp.length() > 5))
 			stamp = stamp.substring(0, stamp.length() - 5) + ".000" + stamp.substring(stamp.length() - 5);
 		
-//		System.out.println("***: " + stamp);
+//		log.info("***: " + stamp);
 		
 		formatter.setLenient(false);
 		Date parsedDate = formatter.parse(stamp);

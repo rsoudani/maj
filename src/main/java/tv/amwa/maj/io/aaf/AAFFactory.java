@@ -59,6 +59,7 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hpsf.ClassID;
 import org.apache.poi.poifs.eventfilesystem.POIFSReader;
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
@@ -78,7 +79,7 @@ import tv.amwa.maj.model.Preface;
  *
  *
  */
-
+@Slf4j
 public class AAFFactory 
 	implements AAFConstants {
 
@@ -143,7 +144,7 @@ public class AAFFactory
 	    DirectoryEntry rootDir = outputFileSystem.getRoot();
 
 	    preface.updateDictionaries();
-//	    System.out.println(preface);
+//	    log.info(preface);
 	    
 	    AAFWriterListener aafWriter = AAFBuilder.makeAAFWriterListener();
 	    DirectoryEntry metaDictionaryDir = rootDir.createDirectory(META_DICTIONARY_DIRNAME);
@@ -196,7 +197,7 @@ public class AAFFactory
 			String args[]) {
 		
 		if (args.length == 0) {
-			System.out.println("Usage: java tv.amwa.maj.io.aaf.AAFFactory <aaf_file>");
+			log.info("Usage: java tv.amwa.maj.io.aaf.AAFFactory <aaf_file>");
 			System.exit(1);
 		}
 		
@@ -210,15 +211,15 @@ public class AAFFactory
 				preface = readPreface(filename);
 				long endTime = System.currentTimeMillis();
 
-				System.out.println("INFO: Reading AAF file took " + (endTime - startTime) + "ms.");
+				log.info("INFO: Reading AAF file took " + (endTime - startTime) + "ms.");
 //			}
-			System.out.println(preface.toString());
+			log.info(preface.toString());
 		
 //			AvidFactory.registerAvidExtensions();
 //			writePreface(preface, args[1]);
 		}
 		catch (IOException ioe) {
-			System.err.println("Error reading file " + filename + ": " + ioe.getMessage());
+			log.warn("Error reading file " + filename + ": " + ioe.getMessage());
 			ioe.printStackTrace();
 			System.exit(1);
 		}

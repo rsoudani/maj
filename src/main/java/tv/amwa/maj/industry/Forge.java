@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import lombok.extern.slf4j.Slf4j;
 import tv.amwa.maj.constant.CommonConstants;
 import tv.amwa.maj.enumeration.EdgeType;
 import tv.amwa.maj.enumeration.FilmType;
@@ -205,7 +206,7 @@ import tv.amwa.maj.util.Utilities;
  *
  *
  */
-
+@Slf4j
 public final class Forge {
 
 	private Forge() { }
@@ -2180,7 +2181,7 @@ public final class Forge {
 						}
 						catch (Exception e) { 
 							// TODO consider removing this output - included for development
-							System.err.println("Info: Possible unsafe setting of property " + 
+							log.warn("Info: Possible unsafe setting of property " +
 									requiredTest.getMemberOf().getName() + "." + requiredTest.getName() + 
 									" due to a " + e.getClass().getName() + ": " + e.getMessage());
 							// Not being strict, so allow to continue

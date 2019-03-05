@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import lombok.extern.slf4j.Slf4j;
 import tv.amwa.maj.exception.EndOfDataException;
 import tv.amwa.maj.exception.InsufficientSpaceException;
 import tv.amwa.maj.industry.MediaEngine;
@@ -44,6 +45,7 @@ import tv.amwa.maj.model.Preface;
 import tv.amwa.maj.model.impl.PrefaceImpl;
 import tv.amwa.maj.record.impl.AUIDImpl;
 
+@Slf4j
 public class MXFStream {
 
 	static final int RIP_BYTES_MAX = 262144;
@@ -211,7 +213,7 @@ public class MXFStream {
 					preface = (PrefaceImpl) metadataFromFile;
 
 //				 if (metadataFromFile != null)
-//					System.out.println(XMLBuilder.toXML(metadataFromFile));
+//					log.info(XMLBuilder.toXML(metadataFromFile));
 			}
 		}
 		catch (Exception e) {
@@ -693,7 +695,7 @@ public class MXFStream {
 		int bytesRead = stream.read(lengthData);
 
 		while (bytesRead < berTailLength) {
-			System.out.println("Bytes read less than BER tail length when reading length, with bytesRead = " + bytesRead +
+			log.info("Bytes read less than BER tail length when reading length, with bytesRead = " + bytesRead +
 					" and berTailLength = " + berTailLength + " and input stream " + stream.getClass().getCanonicalName());
 	      if (bytesRead < 0)
 		    throw new MAJMXFStreamException("Unexpectedly reached the end of the stream after the first byte when reading a length.");
@@ -762,7 +764,7 @@ public class MXFStream {
 		int bytesRead = stream.read(valueBytes);
 
 		while (bytesRead < size) {
-			System.out.println("Bytes read less than size on value read, with bytesRead = " + bytesRead + " and size = " + size + ".");
+			log.info("Bytes read less than size on value read, with bytesRead = " + bytesRead + " and size = " + size + ".");
 		    if (bytesRead == -1)
 			  throw new MAJMXFStreamException("Unexpectedly reached the end of the stream when reading a value.");
 		    bytesRead += stream.read(valueBytes, bytesRead, (int) (size - bytesRead));

@@ -16,6 +16,7 @@
 
 package tv.amwa.maj.extensions.example;
 
+import lombok.extern.slf4j.Slf4j;
 import tv.amwa.maj.industry.Forge;
 
 /**
@@ -23,6 +24,7 @@ import tv.amwa.maj.industry.Forge;
  *
  *
  */
+@Slf4j
 public class Main {
 
 	/**
@@ -40,7 +42,7 @@ public class Main {
 				"Creator", EgFactory.make("Person",
 						"Name", "Richard Rogers",
 						"DOB", Forge.makeDate((byte) 11, (byte) 10, (short) 2003)));
-		System.out.println(description.toString());
+		log.info(description.toString());
 	}
 
 }

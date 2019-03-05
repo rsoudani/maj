@@ -97,7 +97,7 @@ public class AMWADemoClass
     amwaPackage.appendPackageTrack(amwaVideoTrack);
     amwaPackage.appendPackageUserComment("company", "portability 4 media");
 
-    System.out.println(amwaPackage.toString());
+    log.info(amwaPackage.toString());
   }
 }
 ```

@@ -111,6 +111,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hpsf.ClassID;
 import org.apache.poi.poifs.eventfilesystem.POIFSReader;
 import org.apache.poi.poifs.eventfilesystem.POIFSReaderEvent;
@@ -164,7 +165,7 @@ import tv.amwa.maj.model.impl.PrefaceImpl;
 import tv.amwa.maj.record.AUID;
 import tv.amwa.maj.record.impl.AUIDImpl;
 import tv.amwa.maj.util.Utilities;
-
+@Slf4j
 public class AAFBuilder 
 	implements AAFConstants {
 
@@ -262,7 +263,7 @@ public class AAFBuilder
 					
 //					for ( int x = 0 ; x < 16 ; x++)
 //						System.err.print(event.getProperty().getStorageClsid().getBytes()[x] + " ");
-//					System.err.println();
+//					log.warn();
 					
 					ClassDefinition theClass = ClassDefinitionImpl.forAUID(classID);
 					if (theClass != null) {
@@ -270,7 +271,7 @@ public class AAFBuilder
 						likelyParent = theClass;
 					}
 					else {
-						System.err.println("UNRECOGNISED CLASS " + classID.toString());
+						log.warn("UNRECOGNISED CLASS " + classID.toString());
 						classStack.add(0, null);
 						if (classStack.size() > 1) 
 							likelyParent = classStack.get(1);
@@ -289,11 +290,11 @@ public class AAFBuilder
 //				ByteBuffer buffer = ByteBuffer.wrap(data);
 //				
 				if (event.getName().equals(REFERENCED_PROPERTIES_STREAMNAME)) {
-//						System.out.println("FOUND REFERENCED PROPERTIES!!!!");
+//						log.info("FOUND REFERENCED PROPERTIES!!!!");
 //						
 //						while (buffer.hasRemaining())
 //							System.out.print(Integer.toHexString(buffer.get()) + " ");
-//						System.out.println();
+//						log.info();
 						
 //					DocumentInputStream fromProperties = event.getStream();	
 //					// TODO the available method is not recommended ... look for an alternative
@@ -347,7 +348,7 @@ public class AAFBuilder
 				fromProperties.read(data);
 				
 				ByteBuffer buffer = ByteBuffer.wrap(data);
-//				System.out.println("Adding a stream with path : " + event.getPath().toString() + File.separator + event.getName());
+//				log.info("Adding a stream with path : " + event.getPath().toString() + File.separator + event.getName());
 				streamMap.put(event.getPath().toString() + File.separator + event.getName(), 
 						new MemoryResidentStream(buffer));
 				
@@ -379,7 +380,7 @@ public class AAFBuilder
 //			buffer.mark();
 //			for ( int x = 0 ; x < 16 ; x++ )
 //				if (buffer.hasRemaining()) System.err.print(buffer.get() + " ");
-//			System.err.println();
+//			log.warn();
 //			buffer.reset();
 //			}
 			
@@ -395,11 +396,11 @@ public class AAFBuilder
 
 			if (likelyParent == null) {
 				if (!eventPath.equals(File.separator))
-					System.err.println("Cannot decode null class definition for path " + eventPath + ".");
+					log.warn("Cannot decode null class definition for path " + eventPath + ".");
 				return null;
 			}
 
-			// System.out.println("Properties: count = " + count + " for class " + likelyParent.getName());
+			// log.info("Properties: count = " + count + " for class " + likelyParent.getName());
 			
 			MetadataObject mdObject = likelyParent.createInstance();
 			if (!(Warehouse.lookForClass(mdObject.getClass()).getAUID().equals(likelyParent.getAUID()))) {
@@ -438,12 +439,12 @@ public class AAFBuilder
 						property = extensionPropertyMap.get(propertyID);
 					properties[x] = property;
 					
-//					System.out.println(property.getMemberOf().getName() + "." + property.getName() + " " + 
+//					log.info(property.getMemberOf().getName() + "." + property.getName() + " " +
 //							property.getTypeDefinition().getName() + " length " + lengths[x] + 
 //							" form " + structuredTypes.get((byte) storedForm));
 				}
 				catch (BadParameterException bpe) {
-					System.err.println("Encountered a non-existent property with code " + propertyID + 
+					log.warn("Encountered a non-existent property with code " + propertyID +
 							" for class " + likelyParent.getName() + ".");
 				}
 			}
@@ -453,7 +454,7 @@ public class AAFBuilder
 			for ( int x = 0 ; x < count ; x++ ) {
 
 				buffer.limit(buffer.position() + lengths[x]);
-//				System.err.println(properties[x].getMemberOf().getName() + "." + properties[x].getName() + " " +
+//				log.warn(properties[x].getMemberOf().getName() + "." + properties[x].getName() + " " +
 //						"position = " + buffer.position() + " remaining = " + buffer.remaining() + " required = " + lengths[x]);
 				
 				try {
@@ -462,13 +463,13 @@ public class AAFBuilder
 						propertyType = properties[x].getTypeDefinition();
 					else {
 						// TODO does this ever happen ... should it be removed?
-						System.err.println("Unexpetedly encountered a null property for class " + likelyParent.getName() +
+						log.warn("Unexpetedly encountered a null property for class " + likelyParent.getName() +
 								" index " + x + ".");
 						continue;
 					}
 
 					if (propertyType == null) {
-						System.err.println("Found an unknown type definition for property " + properties[x].getMemberOf().getName() +
+						log.warn("Found an unknown type definition for property " + properties[x].getMemberOf().getName() +
 								"." + properties[x].getName() + ".");
 						continue;
 					}
@@ -477,7 +478,7 @@ public class AAFBuilder
 					
 					case WeakObjRef:
 //						buffer.mark();
-//						System.out.println(properties[x].getName() + 
+//						log.info(properties[x].getName() +
 //								" tag " + Integer.toHexString(properties[x].getLocalIdentification()) + ": ");
 //						for ( int y = 0 ; y < lengths[x] ; y++ ) {
 //							byte nextByte = buffer.get();
@@ -485,7 +486,7 @@ public class AAFBuilder
 //							System.out.print(hexChar[nextByte & 15]);
 //							System.out.print(' ');
 //						}
-//						System.out.println();
+//						log.info();
 //						buffer.reset();
 						
 						PropertyValue weakReferenceValue = propertyType.createFromBytes(buffer);
@@ -500,25 +501,25 @@ public class AAFBuilder
 						case StrongObjRef:
 						case WeakObjRef:
 							String referenceName = TypeDefinitions.UTF16String.createFromBytes(buffer).getValue().toString();
-							// System.out.println("Array with ref name " + referenceName);
+							// log.info("Array with ref name " + referenceName);
 							localResolutions.add(new ResolutionEntry(properties[x], mdObject, eventPath + 
 									File.separator + referenceName));
 							break;
 						case Character:
 							Collection<String> stringElements = bufferToStringList(buffer);
-							// System.out.println(lengths[x] + ": " + stringElements.toString());
+							// log.info(lengths[x] + ": " + stringElements.toString());
 							PropertyValue stringListValue = propertyType.createValue(stringElements);
 							properties[x].setPropertyValue(mdObject, stringListValue);							
 							break;
 						default:
-//							System.out.println("About to process variable array value " + properties[x].getMemberOf().getName() + "." +
+//							log.info("About to process variable array value " + properties[x].getMemberOf().getName() + "." +
 //									properties[x].getName() + ":" + buffer.toString());
 //							int preservePosition = buffer.position();
 //							while (buffer.hasRemaining()) {
 //								System.out.print(Integer.toHexString(buffer.get()) + ", ");
 //							}
 //							buffer.position(preservePosition);
-//							System.out.println();
+//							log.info();
 
 							List<PropertyValue> arrayValues = new Vector<PropertyValue>();
 							while (buffer.hasRemaining()) 
@@ -563,16 +564,16 @@ public class AAFBuilder
 								File.separator + referenceName));
 						break;
 					case Stream:
-//						System.out.println("About to process stream value " + properties[x].getMemberOf().getName() + "." +
+//						log.info("About to process stream value " + properties[x].getMemberOf().getName() + "." +
 //								properties[x].getName() + ":" + buffer.toString());
 //						int preservePosition = buffer.position();
 //						while (buffer.hasRemaining()) {
 //							System.out.print(Integer.toHexString(buffer.get()) + ", ");
 //						}
 //						buffer.position(preservePosition);
-//						System.out.println();
+//						log.info();
 						if (!buffer.hasRemaining()) {
-							System.err.println("Found a stream with no data at path " + eventPath + ".");
+							log.warn("Found a stream with no data at path " + eventPath + ".");
 							break;
 						}
 						
@@ -584,17 +585,17 @@ public class AAFBuilder
 							
 						resolutions.add(new ResolutionEntry(properties[x], mdObject, streamReferenceName, streamByteOrder));
 
-//						System.err.println("Found a stream with path " + streamReferenceName);
+//						log.warn("Found a stream with path " + streamReferenceName);
 						break;
 					case Indirect:
-//						System.out.println("About to process indirect value " + properties[x].getMemberOf().getName() + "." +
+//						log.info("About to process indirect value " + properties[x].getMemberOf().getName() + "." +
 //								properties[x].getName() + ":" + buffer.toString());
 //						int preservePosition = buffer.position();
 //						while (buffer.hasRemaining()) {
 //							System.out.print(Integer.toHexString(buffer.get()) + ", ");
 //						}
 //						buffer.position(preservePosition);
-//						System.out.println();
+//						log.info();
 						
 						byte localCode = buffer.get(); // read past '4c' that starts it all
 						ByteOrder preserveOrder = buffer.order();
@@ -604,14 +605,14 @@ public class AAFBuilder
 							buffer.order(ByteOrder.BIG_ENDIAN);
 	
 						PropertyValue indirectValue = TypeDefinitions.Indirect.createFromBytes(buffer);
-//						System.out.println("Indirect value for property " + properties[x].getName() + " is " +
+//						log.info("Indirect value for property " + properties[x].getName() + " is " +
 //								((PropertyValue) indirectValue.getValue()).getValue().toString() + ".");
 						buffer.order(preserveOrder);
 						properties[x].setPropertyValue(mdObject, indirectValue);
 						break;
 					default:
 //						if (propertyType.getTypeCategory() == TypeCategory.ExtEnum) {
-//							System.out.println("About to process ext enum value " + properties[x].getMemberOf().getName() + "." +
+//							log.info("About to process ext enum value " + properties[x].getMemberOf().getName() + "." +
 //									properties[x].getName() + ":" + buffer.toString());
 //						
 //							int preservePosition = buffer.position();
@@ -619,7 +620,7 @@ public class AAFBuilder
 //								System.out.print(Integer.toHexString(buffer.get()) + ", ");
 //							}
 //							buffer.position(preservePosition);
-//							System.out.println();
+//							log.info();
 //						}
 						
 						PropertyValue theValue = propertyType.createFromBytes(buffer);
@@ -642,9 +643,9 @@ public class AAFBuilder
 			
 			if (mdObject instanceof MetaDefinition) {
 //				if (!MediaEngine.isBaseline((MetaDefinition) mdObject))
-//					System.err.println("Found an extension " + likelyParent.getName() + " with name " + 
+//					log.warn("Found an extension " + likelyParent.getName() + " with name " +
 //							((MetaDefinition) mdObject).getName() + ".");
-//				System.out.println(mdObject.toString());
+//				log.info(mdObject.toString());
 
 				if (mdObject instanceof PropertyDefinition) {
 					PropertyDefinition propertyDefinition = (PropertyDefinition) mdObject;
@@ -683,7 +684,7 @@ public class AAFBuilder
 					WeakReference.registerTarget((WeakReferenceTarget) mdObject);
 			}
 
-			// System.out.println(mdObject.toString());
+			// log.info(mdObject.toString());
 			resolutions.addAll(localResolutions);
 			return mdObject;
 		}
@@ -786,7 +787,7 @@ public class AAFBuilder
 								(resolution.getProperty().getAUID().equals(CommonConstants.ParentClassID))) {
 							resolution.resolve(pathMap, indexMap, streamMap);
 							classDefinition.setJavaImplementation(classDefinition.getParent().getJavaImplementation());
-							// System.out.println(classDefinition.toString());
+							// log.info(classDefinition.toString());
 						}
 					}
 					
@@ -863,7 +864,7 @@ public class AAFBuilder
 				return;
 			}
 			
-			System.err.println("Unhandled writer event " + fullEventPath + ".");
+			log.warn("Unhandled writer event " + fullEventPath + ".");
 		}
 		
 		private void encodeProperties(
@@ -881,7 +882,7 @@ public class AAFBuilder
 			
 			if (propertyMap == null) {
 				// Can happen legitimately for all optional objects
-				System.err.println("Could not find information for " + event.getPath().toString() + File.separator + "properties.");
+				log.warn("Could not find information for " + event.getPath().toString() + File.separator + "properties.");
 				// Should write an empty property maps
 				
 				try {
@@ -899,7 +900,7 @@ public class AAFBuilder
 			}
 			
 //			if ( propertyMap.size() == 0)
-//				System.out.println("Found an empty property map.");				
+//				log.info("Found an empty property map.");
 
 			String propertyName = null;
 			// PropertyDefinition currentProperty = null;
@@ -1054,10 +1055,10 @@ public class AAFBuilder
 //				buffer.limit(buffer.position());
 //				buffer.rewind();
 //
-//				System.out.println(event.getPath().toString() + "/properties:");
+//				log.info(event.getPath().toString() + "/properties:");
 //				while (buffer.hasRemaining())
 //					System.out.print(Integer.toHexString(buffer.get()) + " ");
-//				System.out.println();
+//				log.info();
 //
 //				buffer.limit(event.getLimit());
 				buffer.mark();
@@ -1074,7 +1075,7 @@ public class AAFBuilder
 					
 					if (property.getAUID().equals(AAFConstants.ParametersID)) {
 						referenceName = makeAAFPathPartReference(property, getLocalID(property.getAUID()));
-//						System.out.println("Writing set with reference name " + referenceName);
+//						log.info("Writing set with reference name " + referenceName);
 						value = TypeDefinitions.UTF16String.createValue(referenceName);
 						TypeDefinitions.UTF16String.writeAsStructuredStorageBytes(value, buffer);						
 						continue;
@@ -1109,7 +1110,7 @@ public class AAFBuilder
 						buffer.putShort(theReference.getData3());
 						buffer.put(theReference.getData4());
 						
-//						System.out.println("*** WEAK REFERENCE ***");
+//						log.info("*** WEAK REFERENCE ***");
 						break;
 					case VariableArray:
 						TypeDefinition arrayRefType = ((TypeDefinitionVariableArray) propertyType).getType();
@@ -1147,7 +1148,7 @@ public class AAFBuilder
 						case StrongObjRef:
 						case WeakObjRef:
 							referenceName = makeAAFPathPartReference(property, getLocalID(property.getAUID()));
-//							System.out.println("Writing set with reference name " + referenceName);
+//							log.info("Writing set with reference name " + referenceName);
 							value = TypeDefinitions.UTF16String.createValue(referenceName);
 							TypeDefinitions.UTF16String.writeAsStructuredStorageBytes(value, buffer);
 							break;
@@ -1207,7 +1208,7 @@ public class AAFBuilder
 //						System.out.print(property.getName() + ":");
 //						while (buffer.hasRemaining())
 //							System.out.print(Integer.toHexString(buffer.get()) + " ");
-//						System.out.println();
+//						log.info();
 //					}
 					
 					buffer.mark();
@@ -1215,22 +1216,22 @@ public class AAFBuilder
 
 				} // for loop property
 
-//				System.out.println(buffer.toString() + " limit " + event.getLimit());
+//				log.info(buffer.toString() + " limit " + event.getLimit());
 				
 				dos.write(buffer.array());
 			} // Try
 			catch (InsufficientSpaceException ise) {
-				System.err.println("Run out of space in buffer when writing " + event.getPath().toString() + "/properties : " + event.getLimit());
-				System.err.println("Property is: " + propertyName);
+				log.warn("Run out of space in buffer when writing " + event.getPath().toString() + "/properties : " + event.getLimit());
+				log.warn("Property is: " + propertyName);
 				if (value != null)
-					System.err.println(value.getValue().toString());
+					log.warn(value.getValue().toString());
 			} catch (IOException ioe) {
-				System.err.println("IO exception thrown when trying to write structured storage property values for path " +
+				log.warn("IO exception thrown when trying to write structured storage property values for path " +
 						event.getPath().toString() + ": " + ioe.getMessage());
 				ioe.printStackTrace();
 			}
 			finally {
-//				System.out.println("Closing dos.");
+//				log.info("Closing dos.");
 				if (dos != null)
 					dos.close();
 			}
@@ -1270,7 +1271,7 @@ public class AAFBuilder
 							try {
 								// TODO probably should not have gone so low
 								if (parentType == null) {
-									System.err.println("++*: Target is " + target + " for weak type " + weakType.getName());
+									log.warn("++*: Target is " + target + " for weak type " + weakType.getName());
 								}
 								PropertyDefinition nextInLine = parentType.lookupPropertyDefinition(target);
 								buffer.putShort(nextInLine.getLocalIdentification());
@@ -1280,24 +1281,24 @@ public class AAFBuilder
 										((TypeDefinitionStrongObjectReference) nextInLine.getTypeDefinition()).getObjectType();
 							}
 							catch (BadParameterException bpe) {
-								System.err.println("Error making reference properties for target property " + target.toString() + ".");
+								log.warn("Error making reference properties for target property " + target.toString() + ".");
 							}					
 						}
 						buffer.putShort((short) 0);
 					}
 				}
 				
-//				System.out.println("WRITING REFERENCED PROPERTIES");
+//				log.info("WRITING REFERENCED PROPERTIES");
 //				buffer.rewind();
 //				while (buffer.hasRemaining())
 //					System.out.print(Integer.toHexString(buffer.get()) + " ");
-//				System.out.println();
+//				log.info();
 				
 				buffer.rewind();
 				dos.write(buffer.array());
 			}
 			catch (IOException ioe) {
-				System.err.println("IO exception thrown when trying to write refistered properties: " + ioe.getMessage());
+				log.warn("IO exception thrown when trying to write refistered properties: " + ioe.getMessage());
 				ioe.printStackTrace();
 			}
 			finally {
@@ -1337,11 +1338,11 @@ public class AAFBuilder
 				dos.write(buffer.array());
 			}
 			catch (InsufficientSpaceException ise) {
-				System.err.println("Insufficient space to write the root properties strucutre.");
+				log.warn("Insufficient space to write the root properties strucutre.");
 				ise.printStackTrace();
 			}
 			catch (IOException ioe) {
-				System.err.println("IO exception thrown when writing the root properties: " + ioe.getMessage());
+				log.warn("IO exception thrown when writing the root properties: " + ioe.getMessage());
 				ioe.printStackTrace();
 			}
 			finally {
@@ -1372,7 +1373,7 @@ public class AAFBuilder
 					switch (arrayRefType.getTypeCategory()) {
 					
 					case StrongObjRef:
-//						System.out.println("*** STRONG REFERENCE VECTOR INDEX ***");
+//						log.info("*** STRONG REFERENCE VECTOR INDEX ***");
 						count = variableArrayType.getCount(value);
 						buffer.putInt(count);
 						buffer.putInt(count);
@@ -1381,7 +1382,7 @@ public class AAFBuilder
 							buffer.putInt(x);
 						break;
 					case WeakObjRef:
-//						System.out.println("*** WEAK REFERENCE VECTOR INDEX ***");
+//						log.info("*** WEAK REFERENCE VECTOR INDEX ***");
 						
 						count = variableArrayType.getCount(value);
 						buffer.putInt(count);
@@ -1402,7 +1403,7 @@ public class AAFBuilder
 							identificationSize = (byte) uniqueProperty.getTypeDefinition().lengthAsBytes(sampleIDValue);
 						}
 						else {
-							System.err.println("Warning: When writing AAF, found an element of a weak reference vector that does not have an identifier: Type " + 
+							log.warn("Warning: When writing AAF, found an element of a weak reference vector that does not have an identifier: Type " +
 									referencedValueClass.getName());
 							buffer.putShort((short) 0);
 							identificationSize = 0;
@@ -1436,7 +1437,7 @@ public class AAFBuilder
 					switch (setRefType.getTypeCategory()) {
 					
 					case StrongObjRef:
-//						System.out.println("*** STRONG REFERENCE SET INDEX ***");
+//						log.info("*** STRONG REFERENCE SET INDEX ***");
 						boolean isInterchange = interchangeObjectPath.equals(event.getPath().toString());
 						
 						count = (value.getType().getTypeCategory() == TypeCategory.VariableArray) ?
@@ -1497,7 +1498,7 @@ public class AAFBuilder
 							identificationSize = 16;
 						}
 						else {
-							System.err.println("Warning: When writing AAF, found an element of a strong reference set that does not have an identifier: Type " + 
+							log.warn("Warning: When writing AAF, found an element of a strong reference set that does not have an identifier: Type " +
 									referencedValueClass.getName());
 							buffer.putShort((short) 0);
 							identificationSize = 0;
@@ -1528,7 +1529,7 @@ public class AAFBuilder
 						}
 						break;
 					case WeakObjRef:
-//						System.out.println("*** WEAK REFERENCE SET INDEX ***");
+//						log.info("*** WEAK REFERENCE SET INDEX ***");
 						TypeDefinitionSet setType = (TypeDefinitionSet) value.getType();
 						
 						count = setType.getCount(value);
@@ -1556,7 +1557,7 @@ public class AAFBuilder
 									(byte) weakUniqueProperty.getTypeDefinition().lengthAsBytes(sampleIDValue); 
 						}
 						else {
-							System.err.println("Warning: When writing AAF, found an element of a weak reference vector that does not have an identifier: Type " + 
+							log.warn("Warning: When writing AAF, found an element of a weak reference vector that does not have an identifier: Type " +
 									weakReferencedValueClass.getName());
 							buffer.putShort((short) 0);
 							weakIdentificationSize = 0;
@@ -1576,10 +1577,10 @@ public class AAFBuilder
 						}
 						buffer.rewind();
 						
-//						System.out.println("*** WRITING INDEX ***");
+//						log.info("*** WRITING INDEX ***");
 //						while (buffer.hasRemaining())
 //							System.out.print(Integer.toHexString(buffer.get()) + " ");
-//						System.out.println();
+//						log.info();
 			
 						break;
 					default:
@@ -1591,7 +1592,7 @@ public class AAFBuilder
 				dos.write(buffer.array());
 			}
 			catch (IOException ioe) {
-				System.err.println("IO excetion thrown when writing index with path " + event.getPath().toString() + ": " +
+				log.warn("IO excetion thrown when writing index with path " + event.getPath().toString() + ": " +
 						ioe.getMessage());
 				ioe.printStackTrace();
 			}
@@ -1614,7 +1615,7 @@ public class AAFBuilder
 				dos.write(stream.read((int) (stream.getLength()-stream.getPosition())).array());
 			}
 			catch (IOException ioe) {
-				System.err.println("IO excetion thrown when writing stream with path " + event.getPath().toString() + ": " +
+				log.warn("IO excetion thrown when writing stream with path " + event.getPath().toString() + ": " +
 						ioe.getMessage());
 				ioe.printStackTrace();
 			}
@@ -1725,7 +1726,7 @@ public class AAFBuilder
 			if (localID <= 0) 
 					localID = nextDynamicID--;
 			
-//			System.err.println("Registering property " + propertyID + " with ID " + localID);
+//			log.warn("Registering property " + propertyID + " with ID " + localID);
 			localIDTable.put(propertyID, localID);
 		}
 		
@@ -1741,9 +1742,9 @@ public class AAFBuilder
 			throws NullPointerException {
 	
 			if (streamDocument == null)
-				System.err.println("Cannot register a stream to write with a null stream document.");
+				log.warn("Cannot register a stream to write with a null stream document.");
 			if (stream == null)
-				System.err.println("Cannot register a stream to write with a null stream.");
+				log.warn("Cannot register a stream to write with a null stream.");
 			
 			String fullStreamPath = makePathForDirectory(streamDocument.getParent()) + File.separator + streamDocument.getName();
 			streamMap.put(fullStreamPath, stream);
@@ -1860,8 +1861,8 @@ public class AAFBuilder
 		String path = makePathForDirectory(classDir);
 		classDir.setStorageClsid(new AAFClassID(rootClass.getAUID()));
 		
-//		System.out.println(path + " " + classDir.getStorageClsid());
-//		System.out.println(path + File.separator + "properties");
+//		log.info(path + " " + classDir.getStorageClsid());
+//		log.info(path + File.separator + "properties");
 		
 		Set<PropertyDefinition> properties = rootClass.getAllPropertyDefinitions();
 		if (rootObject instanceof MetaDefinition)
@@ -1891,9 +1892,9 @@ public class AAFBuilder
 					
 			// Check to see if we don't have a value for everything else
 			if (!valueMap.containsKey(property)) {
-				System.err.println("Found a required property not in the value map for " + rootClass.getName() + "." +
+				log.warn("Found a required property not in the value map for " + rootClass.getName() + "." +
 						property.getName() + ".");
-				System.err.println(rootObject.toString());
+				log.warn(rootObject.toString());
 				continue;
 			}
 			
@@ -2237,10 +2238,10 @@ public class AAFBuilder
 	    }
 	    long endTime = System.nanoTime();
 	    
-	    System.out.println("AAF file read in " + (endTime - startTime) + "ns.");
+	    log.info("AAF file read in " + (endTime - startTime) + "ns.");
 
 	    ((PrefaceImpl) eventReader.getPreface()).setByteOrder(tv.amwa.maj.enumeration.ByteOrder.Big);
-	    System.out.println(eventReader.getPreface().getByteOrder());
+	    log.info(eventReader.getPreface().getByteOrder().toString());
 
 	    POIFSFileSystem outputFileSystem = new POIFSFileSystem();
 	    

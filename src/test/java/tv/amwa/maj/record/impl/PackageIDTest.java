@@ -43,6 +43,7 @@ import static org.junit.Assert.*;
 import java.text.ParseException;
 import java.util.Arrays;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
 import tv.amwa.maj.enumeration.MaterialType;
@@ -56,6 +57,7 @@ import tv.amwa.maj.record.impl.AUIDImpl;
 import tv.amwa.maj.record.impl.PackageIDImpl;
 import tv.amwa.maj.util.Utilities;
 
+@Slf4j
 public class PackageIDTest {
 
 	private final static byte[] forwardBytes;
@@ -356,10 +358,10 @@ public class PackageIDTest {
 				
 				if (materialNumbers[x].equals(materialNumbers[y])) {
 				
-					System.err.println("Classhing material numbers at indexes " + x + " and " + y + ": " + 
+					log.warn("Classhing material numbers at indexes " + x + " and " + y + ": " +
 							materialNumbers[x].toString());
 					for ( int z = x - 1 ; z < y + 2 ; z++ )
-						System.err.println("    " + z + ": " + materialNumbers[z].toString());
+						log.warn("    " + z + ": " + materialNumbers[z].toString());
 					clashCount++;
 				}
 			}
@@ -418,7 +420,7 @@ public class PackageIDTest {
 	@Test
 	public void testFromPersistentFormForward() {
 		
-		System.out.println(forwardUmidPersist.length());
+		log.info(forwardUmidPersist.length() + "");
 		assertTrue(forwardUmid.equals(PackageIDImpl.fromPersistentForm(forwardUmidPersist)));
 	}
 	

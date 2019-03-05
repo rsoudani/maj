@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import tv.amwa.maj.exception.EndOfDataException;
 import tv.amwa.maj.exception.InsufficientSpaceException;
 import tv.amwa.maj.exception.PropertyNotPresentException;
@@ -59,7 +60,7 @@ import tv.amwa.maj.meta.TypeDefinitionVariableArray;
 import tv.amwa.maj.model.Preface;
 import tv.amwa.maj.record.AUID;
 import tv.amwa.maj.record.impl.AUIDImpl;
-
+@Slf4j
 @MediaClass(uuid1 = 0x0d010201, uuid2 = 0x0105, uuid3 = 0x0100,
 		uuid4 = { 0x06, 0x0e, 0x2b, 0x34, 0x02, 0x05, 0x01, 0x01 },
 		definedName = "PrimerPack",
@@ -175,7 +176,7 @@ public class PrimerPackImpl
 			@UInt16 short localTag) {
 
 		if (!(localTagBatch.containsKey(localTag))) {
-			System.err.println("Could not find tag 0x" + Integer.toHexString(localTag) + " in this primer pack.");
+			log.warn("Could not find tag 0x" + Integer.toHexString(localTag) + " in this primer pack.");
 			return null;
 		}
 		return localTagBatch.get(localTag).getUID();
@@ -235,7 +236,7 @@ public class PrimerPackImpl
 
 		Short localTag = reverseMap.get(uid);
 		if (localTag == null) {
-			System.err.println("Cannot map the given identifier for a property " + uid.toString() + " to a tag.");
+			log.warn("Cannot map the given identifier for a property " + uid.toString() + " to a tag.");
 			return null;
 		}
 		else
@@ -256,7 +257,7 @@ public class PrimerPackImpl
 
 		Short localTag = reverseMap.get(propertyID);
 		if (localTag == null) {
-			System.err.println("Cannot map the given property " + propertyDefinition.getMemberOf().getName() + "." +
+			log.warn("Cannot map the given property " + propertyDefinition.getMemberOf().getName() + "." +
 					propertyDefinition.getName() + " to a tag.");
 			return null;
 		}
@@ -426,7 +427,7 @@ public class PrimerPackImpl
 			String args[]) {
 
 		if (args.length < 1) {
-			System.err.println("Please provide the name of an MXF file to reflect.");
+			log.warn("Please provide the name of an MXF file to reflect.");
 			System.exit(1);
 		}
 
@@ -439,25 +440,25 @@ public class PrimerPackImpl
 			long startTime = System.currentTimeMillis();
 			fromTheFooter = mxfFile.getFooterPartition().readHeaderMetadata();
 			long endTime = System.currentTimeMillis();
-			System.out.println("INFO: Reading MXF File header data took " + (endTime - startTime) + "ms.");
+			log.info("INFO: Reading MXF File header data took " + (endTime - startTime) + "ms.");
 //		}
-		System.out.println(fromTheFooter.getPrimerPack().toString());
-		//System.out.println(fromTheFooter.getPreface().toString());
+		log.info(fromTheFooter.getPrimerPack().toString());
+		//log.info(fromTheFooter.getPreface().toString());
 
-//		System.out.println("Header partition has an index: " + mxfFile.getHeaderPartition().hasIndexTable());
+//		log.info("Header partition has an index: " + mxfFile.getHeaderPartition().hasIndexTable());
 //		IndexTable headerIndex = mxfFile.getHeaderPartition().readIndexTable();
-//		System.out.println(headerIndex.toString());
+//		log.info(headerIndex.toString());
 //
-//		System.out.println("Footer partition has an index: " + mxfFile.getFooterPartition().hasIndexTable());
+//		log.info("Footer partition has an index: " + mxfFile.getFooterPartition().hasIndexTable());
 //		IndexTable footerIndex = mxfFile.getFooterPartition().readIndexTable();
-//		System.out.println(footerIndex.toString());
+//		log.info(footerIndex.toString());
 //
 //		for ( int x = 0 ; x < 10 ; x++ )
-//			System.out.println("Edit unit " + x + " has offset " + Integer.toHexString((int) (0x8000 + footerIndex.streamOffset(x, 2))));
+//			log.info("Edit unit " + x + " has offset " + Integer.toHexString((int) (0x8000 + footerIndex.streamOffset(x, 2))));
 //
 		mxfFile.close();
 
 		PrimerPack generatedPrimer = createFromPreface(fromTheFooter.getPreface());
-		System.out.println(generatedPrimer.toString());
+		log.info(generatedPrimer.toString());
 	}
 }

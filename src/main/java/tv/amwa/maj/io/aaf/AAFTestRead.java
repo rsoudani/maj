@@ -39,6 +39,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.poifs.filesystem.DocumentEntry;
@@ -51,6 +52,7 @@ import org.apache.poi.poifs.storage.BlockWritable;
 import org.apache.poi.poifs.storage.SmallDocumentBlock;
 
 @Deprecated // Old prototype code included for reference only
+@Slf4j
 public class AAFTestRead {
 
 	static int indent = 0;
@@ -76,22 +78,22 @@ public class AAFTestRead {
 
 		    if (entry instanceof DirectoryEntry)
 		    {
-		        //System.out.println(makeIndent() + "Directory :" + entry.getName());
+		        //log.info(makeIndent() + "Directory :" + entry.getName());
 		        
 		        DirectoryNode dirNode = (DirectoryNode) entry;
-		        System.out.println(makeIndent() + dirNode.getPath().toString() + " " + 
+		        log.info(makeIndent() + dirNode.getPath().toString() + " " +
 		        		dirNode.getStorageClsid().toString());
 		        
 		        for ( Iterator jerry = dirNode.getViewableIterator() ; jerry.hasNext() ; ) {
 		        	
 		        	Object theNext = jerry.next();
-		        	// System.out.println("dirNode#" + theNext.toString());
+		        	// log.info("dirNode#" + theNext.toString());
 		        	
 		        	if (theNext instanceof DirectoryProperty) {
 		        	
 		        		@SuppressWarnings("unused")
 						DirectoryProperty dirProperty = (DirectoryProperty) theNext;
-		        		// System.out.println("dirProperty#" + dirProperty.getShortDescription() + ": " + dirProperty.getSize());
+		        		// log.info("dirProperty#" + dirProperty.getShortDescription() + ": " + dirProperty.getSize());
 		        	}
 		        	
 		        }
@@ -101,23 +103,23 @@ public class AAFTestRead {
 		    }
 		    else if (entry instanceof DocumentEntry)
 		    {
-		    	System.out.println(makeIndent() + "Document : " + entry.getName());
+		    	log.info(makeIndent() + "Document : " + entry.getName());
 		    	
-		    	System.out.println(makeIndent() + "Documnent class: " + entry.getClass().getName());
+		    	log.info(makeIndent() + "Documnent class: " + entry.getClass().getName());
 		    	
 		    	for ( Iterator frank = ((DocumentNode) entry).getViewableIterator() ; frank.hasNext() ; ) {
 		    		
 		    		Object theNextDoc = frank.next();
 		    		
-		    		System.out.println("docNode#" + theNextDoc.toString());
+		    		log.info("docNode#" + theNextDoc.toString());
 		    		/*
 		    		if (theNextDoc instanceof DocumentProperty) {
 		    			
 		    			DocumentProperty docProp = (DocumentProperty) theNextDoc;
-		    			System.out.println("docPropertyName: " + docProp.getName() + " " + docProp.getShortDescription());
+		    			log.info("docPropertyName: " + docProp.getName() + " " + docProp.getShortDescription());
 		    			
 		    			for ( Iterator ben = docProp.getViewableIterator() ; ben.hasNext() ; ) {
-		    				System.out.println("HELLO: " + ben.next().toString());
+		    				log.info("HELLO: " + ben.next().toString());
 		    			}
 		    		}*/
 
@@ -125,17 +127,17 @@ public class AAFTestRead {
 		    			
 		    			POIFSDocument theDoc = (POIFSDocument) theNextDoc;
 		    			
-		    			System.out.println("docName: " + theDoc.getShortDescription());
-		    			System.out.println("docBlocks: " + theDoc.countBlocks() + " " + theDoc.getSmallBlocks().length);
+		    			log.info("docName: " + theDoc.getShortDescription());
+		    			log.info("docBlocks: " + theDoc.countBlocks() + " " + theDoc.getSmallBlocks().length);
 		    			
 		    			BlockWritable[] blocks = theDoc.getSmallBlocks();
 		    			for ( int x = 0 ; x < blocks.length ; x++ ) {
-		    				System.out.println("Block " + x + ": " + blocks[x].toString());
+		    				log.info("Block " + x + ": " + blocks[x].toString());
 		    			
 		    				if (blocks[x] instanceof SmallDocumentBlock) {
 		    					
 		    					SmallDocumentBlock block = (SmallDocumentBlock) blocks[x];
-		    					System.out.println(Arrays.toString(block.getData()));
+		    					log.info(Arrays.toString(block.getData()));
 		    				}
 		    			}
 		    		}
@@ -147,7 +149,7 @@ public class AAFTestRead {
 		        // currently, either an Entry is a DirectoryEntry or a DocumentEntry,
 			// but in the future, there may be other entry subinterfaces. The
 			// internal data structure certainly allows for a lot more entry types.
-		    	System.out.println("Unknown entry of type " + entry.getClass().getName());
+		    	log.info("Unknown entry of type " + entry.getClass().getName());
 		    }
 		}
 
@@ -171,12 +173,12 @@ public class AAFTestRead {
 		}
 		catch (IOException e)
 		{
-		    System.err.println(e.getMessage());
+		    log.warn(e.getMessage());
 		    e.printStackTrace();
 		}
 		DirectoryEntry root = fs.getRoot();
 		
-		System.out.println("Root: " + root.getName());
+		log.info("Root: " + root.getName());
 		
 		try {
 			entryIterator(root);

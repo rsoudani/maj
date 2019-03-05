@@ -26,6 +26,7 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -57,6 +58,7 @@ import tv.amwa.maj.meta.impl.ClassDefinitionImpl;
 
 // TODO comments
 // TODO tests
+@Slf4j
 public class ExtensionSchemeGenerator
 	extends GenerationCore {
 
@@ -287,15 +289,15 @@ public class ExtensionSchemeGenerator
 
 		FileReader fileReader = new FileReader(args[0]);
 		ExtensionScheme scheme = generateExtensionScheme(fileReader);
-		System.out.println(scheme.toString());
+		log.info(scheme.toString());
 
-		System.out.println(Warehouse.lookForClass("PolyFileDescriptor").toString());
-		System.out.println(Warehouse.lookForProperty(Forge.parseAUID("urn:uuid:45e12b0b-ac1d-43ae-9db4-36f065afc3eb")).toString());
-		System.out.println(Warehouse.lookForType("Operation Group Strong Reference Variable Array").toString());
+		log.info(Warehouse.lookForClass("PolyFileDescriptor").toString());
+		log.info(Warehouse.lookForProperty(Forge.parseAUID("urn:uuid:45e12b0b-ac1d-43ae-9db4-36f065afc3eb")).toString());
+		log.info(Warehouse.lookForType("Operation Group Strong Reference Variable Array").toString());
 
 		ClassDefinition polyClass = Warehouse.lookForClass("PolyFileDescriptor");
 		MetadataObject testing = ((ClassDefinitionImpl) polyClass).createInstance();
-		System.out.println(testing.getClass().getCanonicalName());
-		System.out.println(testing.toString());
+		log.info(testing.getClass().getCanonicalName());
+		log.info(testing.toString());
 	}
 }

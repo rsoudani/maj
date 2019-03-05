@@ -136,7 +136,7 @@ public class InterpolationDefinitionImpl
 				if (interpolationMetadata.description().length() > 0)
 					definedInterpolation.setDescription(interpolationMetadata.description());
 		
-				// System.out.println(definedInterpolation.toString());
+				// log.info(definedInterpolation.toString());
 				
 				registerInterpolationDefinition(definedInterpolation);
 				

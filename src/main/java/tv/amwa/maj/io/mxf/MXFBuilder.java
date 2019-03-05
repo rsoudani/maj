@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
+import lombok.extern.slf4j.Slf4j;
 import tv.amwa.maj.constant.CommonConstants;
 import tv.amwa.maj.exception.BadParameterException;
 import tv.amwa.maj.exception.EndOfDataException;
@@ -92,6 +93,7 @@ import tv.amwa.maj.record.impl.AUIDImpl;
  * @see MXFFile
  *
  */
+@Slf4j
 public class MXFBuilder {
 
 	private MXFBuilder() { }
@@ -415,7 +417,7 @@ public class MXFBuilder {
 		ClassDefinition localSetClass = ClassDefinitionImpl.forAUID(key);
 
 		if (localSetClass == null) {
-			System.err.println("Unable to find a local implementation of class with id " + key.toString() +
+			log.warn("Unable to find a local implementation of class with id " + key.toString() +
 					". Skipping " + buffer.remaining() + " bytes.");
 			buffer.position(preserveLimit);
 			return null;
@@ -423,7 +425,7 @@ public class MXFBuilder {
 
 		// TODO add meta dictionary support
 		if (localSetClass.getName().equals("MetaDictionary")) {
-			System.err.println("This version of MAJ does not support processing meta dictionaries in MXF files.");
+			log.warn("This version of MAJ does not support processing meta dictionaries in MXF files.");
 			buffer.position(preserveLimit);
 			return null;
 		}
@@ -431,14 +433,14 @@ public class MXFBuilder {
 		MetadataObject localSetValue = localSetClass.createInstance();
 
 		if (localSetValue == null) {
-			System.err.println("Unable to create an instance of class " + localSetClass.getName() + " implemented by " +
+			log.warn("Unable to create an instance of class " + localSetClass.getName() + " implemented by " +
 					localSetClass.getJavaImplementation().getName() + ". Skipping.");
 			buffer.position(preserveLimit);
 			return null;
 		}
 
 		if (localSetValue instanceof MetaDefinition) {
-			System.err.println("Skipping meta definition " + localSetClass.getName() + ".");
+			log.warn("Skipping meta definition " + localSetClass.getName() + ".");
 			buffer.position(preserveLimit);
 			return null;
 		}
@@ -469,7 +471,7 @@ public class MXFBuilder {
 					byte[] instanceKey = new byte[16];
 					buffer.get(instanceKey);
 //					if (localSetValue instanceof tv.amwa.maj.model.Package)
-//						System.out.println("Adding " + localSetClass.getName() + " package with key " + new AUIDImpl(instanceKey));
+//						log.info("Adding " + localSetClass.getName() + " package with key " + new AUIDImpl(instanceKey));
 					referenceTable.put(new AUIDImpl(instanceKey), localSetValue);
 					continue;
 				}
@@ -479,10 +481,10 @@ public class MXFBuilder {
 			}
 			catch (BadParameterException bpe) {
 				if (propertyKey != null)
-					System.err.println("Unable to resolve tag " + Integer.toHexString(tag) + " and key " + propertyKey.toString() +
+					log.warn("Unable to resolve tag " + Integer.toHexString(tag) + " and key " + propertyKey.toString() +
 							" for class " + localSetClass.getName() + ". Skipping.");
 				else
-					System.err.println("Unable to resolve tag " + Integer.toHexString(tag) +
+					log.warn("Unable to resolve tag " + Integer.toHexString(tag) +
 							" for class " + localSetClass.getName() + ". Skipping.");
 
 				buffer.limit(preserveLimit);
@@ -490,19 +492,19 @@ public class MXFBuilder {
 				continue;
 			}
 
-//			System.out.println(property.getName());
+//			log.info(property.getName());
 
 //			if (property.getName().equals("Delta Entry Array"))
-//				System.out.println("Found it!");
+//				log.info("Found it!");
 
 //			if (localSetValue instanceof MetaDefinition) {
 //				String defName = ((MetaDefinition) localSetValue).getName();
 //				if (defName != null)
-//					System.out.println(defName + "." + property.getName());
+//					log.info(defName + "." + property.getName());
 //			}
 
 			if (propertyIgnoreList.contains(property.getName())) {
-				System.err.println("Ignoring property " + property.getMemberOf().getName() + "." + property.getName() + ".");
+				log.warn("Ignoring property " + property.getMemberOf().getName() + "." + property.getName() + ".");
 				buffer.limit(preserveLimit);
 				buffer.position(buffer.position() + length);
 				continue;
@@ -518,7 +520,7 @@ public class MXFBuilder {
 					throw new NullPointerException("Unexpected null property value created when parsing bytes.");
 			}
 			catch (Exception e) {
-				System.err.println(e.getClass().getName() + " thrown when parsing value of " + property.getMemberOf().getName() + "." + property.getName() + ": " + e.getMessage());
+				log.warn(e.getClass().getName() + " thrown when parsing value of " + property.getMemberOf().getName() + "." + property.getName() + ": " + e.getMessage());
 				buffer.position(buffer.limit());
 				buffer.limit(preserveLimit);
 				continue;
@@ -558,7 +560,7 @@ public class MXFBuilder {
 			return null;
 		}
 
-//		System.out.println(localSetValue.toString());
+//		log.info(localSetValue.toString());
 		if (localSetValue instanceof WeakReferenceTarget)
 			WeakReference.registerTarget((WeakReferenceTarget) localSetValue);
 
@@ -710,7 +712,7 @@ public class MXFBuilder {
 
 			long propertyLength = value.getType().lengthAsBytes(value);
 			if (propertyLength > 65535) {
-				System.err.println("Cannot write a property value longer than 65535 bytes for property " +
+				log.warn("Cannot write a property value longer than 65535 bytes for property " +
 						property.getMemberOf().getName() + "." + property.getName() + ".");
 				continue;
 			}
@@ -796,14 +798,14 @@ public class MXFBuilder {
 			ClassDefinition checkForClass =
 				ClassDefinitionImpl.forAUID(metaDefinition.getAUID());
 			if (checkForClass == null)
-				System.err.println("Warning: A class with name " + metaDefinition.getName() + " is not known to this MAJ runtime.");
+				log.warn("Warning: A class with name " + metaDefinition.getName() + " is not known to this MAJ runtime.");
 			return;
 		}
 
 		if (metaDefinition instanceof PropertyDefinition) {
 
 			if (!ClassDefinitionImpl.isKnownProperty((PropertyDefinition) metaDefinition))
-				System.err.println("Warning: A property with name " + metaDefinition.getName() + " is not known to this MAJ runtime.");
+				log.warn("Warning: A property with name " + metaDefinition.getName() + " is not known to this MAJ runtime.");
 
 			return;
 		}
@@ -814,7 +816,7 @@ public class MXFBuilder {
 				Warehouse.lookForType(metaDefinition.getAUID());
 
 			if (checkForType == null)
-				System.err.println("Warning A type with name " + metaDefinition.getName() + " is not knowmn to this MAJ runtime.");
+				log.warn("Warning A type with name " + metaDefinition.getName() + " is not knowmn to this MAJ runtime.");
 			return;
 		}
 
@@ -907,7 +909,7 @@ public class MXFBuilder {
 			first = buffer.get();
 		}
 		catch (BufferUnderflowException bue) {
-			System.err.println("Incomplete BER length in buffer at 0x" + Long.toHexString(buffer.position()));
+			log.warn("Incomplete BER length in buffer at 0x" + Long.toHexString(buffer.position()));
 			return -1l;
 		}
 
@@ -918,7 +920,7 @@ public class MXFBuilder {
 		byte[] lengthData = new byte[berTailLength];
 
 		if (buffer.remaining() < berTailLength) {
-			System.err.println("Incomplete BER length in buffer at 0x" + Long.toHexString(buffer.position()));
+			log.warn("Incomplete BER length in buffer at 0x" + Long.toHexString(buffer.position()));
 			return -1l;
 		}
 

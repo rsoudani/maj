@@ -39,13 +39,14 @@ import static org.junit.Assert.*;
 
 import java.text.ParseException;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
 import tv.amwa.maj.io.xml.XMLBuilder;
 import tv.amwa.maj.record.impl.RationalImpl;
 
 
-
+@Slf4j
 public class RationalTest {
 
 	private static final RationalImpl zero = new RationalImpl();
@@ -82,13 +83,13 @@ public class RationalTest {
 	@Test(expected=ArithmeticException.class) 
 	public void findIntegerValue() {
 
-		System.out.println(broken.intValue());
+		log.info(broken.intValue() + "");
 	}
 
 	@Test(expected=ArithmeticException.class) 
 	public void findLongValue() {
 		
-		System.out.println(broken.longValue());
+		log.info(broken.longValue() + "");
 	}
 
 	@Test public void rationalToString() {

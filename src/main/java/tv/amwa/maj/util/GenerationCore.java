@@ -49,6 +49,7 @@ import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -71,6 +72,7 @@ import tv.amwa.maj.record.impl.AUIDImpl;
  *
  *
  */
+@Slf4j
 public class GenerationCore {
 
 	protected static Map<String, ClassData> classList = new HashMap<String, ClassData>();
@@ -1240,7 +1242,7 @@ public class GenerationCore {
 			writer.flush();
 		}
 		catch (IOException ioe) {
-			System.err.println("Unable to write to file " + fileToWrite.getAbsolutePath() + ".");
+			log.warn("Unable to write to file " + fileToWrite.getAbsolutePath() + ".");
 			return false;
 		}
 		finally {
@@ -1496,7 +1498,7 @@ public class GenerationCore {
 			return typeData;
 		}
 	
-		System.err.println("Unable to process a type definition with element name " + child.getNodeName() + ".");
+		log.warn("Unable to process a type definition with element name " + child.getNodeName() + ".");
 		return null;
 	}
 
@@ -1626,7 +1628,7 @@ public class GenerationCore {
 			public void addImport(
 					String canonicalName) {
 				
-//				System.out.println("Canonical name = " + canonicalName + " package = " + packageName +
+//				log.info("Canonical name = " + canonicalName + " package = " + packageName +
 //						" lastDot = " + canonicalName.lastIndexOf('.') + " packageNameLength = " + packageName.length());
 				
 				if ((canonicalName != null) && (canonicalName.length() > 0))

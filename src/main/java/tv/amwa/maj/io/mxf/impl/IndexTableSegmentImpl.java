@@ -56,6 +56,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import lombok.extern.slf4j.Slf4j;
 import tv.amwa.maj.exception.BadRateException;
 import tv.amwa.maj.exception.EndOfDataException;
 import tv.amwa.maj.exception.PropertyNotPresentException;
@@ -89,6 +90,7 @@ import tv.amwa.maj.record.impl.AUIDImpl;
  *
  * @see IndexTable
  */
+@Slf4j
 @MediaClass(uuid1 = 0x0d010201, uuid2 = 0x0110, uuid3 = 0x0100,
 		uuid4 = { 0x06, 0x0e, 0x2b, 0x34, 0x02, 0x06, 0x01, 0x01 },
 		definedName = "IndexTableSegment",
@@ -415,7 +417,7 @@ public class IndexTableSegmentImpl
 				indexEntry.resolveBytes(this);
 			}
 			catch (EndOfDataException ede) {
-				System.err.println("Warning: Error resolving bytes for index table segment for index " + indexSID + ".");
+				log.warn("Warning: Error resolving bytes for index table segment for index " + indexSID + ".");
 			}
 		
 		IndexEntry[] copiedArray = new IndexEntry[indexEntryArray.length];
@@ -530,7 +532,7 @@ public class IndexTableSegmentImpl
 				(IndexTableSegment) MXFBuilder.readLocalSet(key, buffer, indexPrimer, referenceTable, resolutions);
 		} 
 		catch (Exception e) {
-			System.err.println(e.getClass().getName() + " thrown when trying to read an index table segment: " + e.getMessage());
+			log.warn(e.getClass().getName() + " thrown when trying to read an index table segment: " + e.getMessage());
 		}
 		finally {
 			buffer.limit(preserveLimit);

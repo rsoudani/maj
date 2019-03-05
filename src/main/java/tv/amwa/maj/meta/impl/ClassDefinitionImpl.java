@@ -100,6 +100,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -142,6 +143,7 @@ import tv.amwa.maj.record.impl.AUIDImpl;
  * @see tv.amwa.maj.industry.TypeDefinitions#ClassDefinitionStrongReference
  * @see tv.amwa.maj.industry.TypeDefinitions#ClassDefinitionStrongReferenceSet
  */
+@Slf4j
 @MediaClass(uuid1 = 0x0d010101, uuid2 = 0x0201, uuid3 = 0x0000,
 		  uuid4 = {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x06, 0x01, 0x01},
 		  definedName = "ClassDefinition",
@@ -587,7 +589,7 @@ public final class ClassDefinitionImpl
 			throw new NullPointerException("Cannot lookup a property definition with a null id.");
 		
 		if (!(properties.containsKey(propertyID))) {
-			if (parentClass == null) System.err.println("*-*-*: " + getName());
+			if (parentClass == null) log.warn("*-*-*: " + getName());
 			if (parentClass.getTarget() != this)
 				return parentClass.getTarget().lookupPropertyDefinition(propertyID);
 			else
@@ -688,7 +690,7 @@ public final class ClassDefinitionImpl
 				PropertyDefinition checkBeforeRemoving = propertiesByName.get(alias);
 				if ((alias.equals(checkBeforeRemoving.getName())) ||
 						(alias.equals(checkBeforeRemoving.getSymbol()))){
-					System.err.println("Warning: Cannot use alias " + alias + " for property " + severalNames.getMemberOf().getName() + "." +
+					log.warn("Warning: Cannot use alias " + alias + " for property " + severalNames.getMemberOf().getName() + "." +
 							severalNames.getName() + " because it clashes with another property name or symbol in the same class.");
 					continue;
 				}
@@ -806,7 +808,7 @@ public final class ClassDefinitionImpl
 				
 				if ((!propertyDefinition.getIsOptional()) &&
 						(!(e.getCause() instanceof BadPropertyException))) {
-					System.err.println("Could not retrieve a value for required property " + getName() + "." + propertyDefinition.getName() + 
+					log.warn("Could not retrieve a value for required property " + getName() + "." + propertyDefinition.getName() + 
 							" because of a " + e.getClass().getName() + ": " + e.getMessage());
 					e.printStackTrace(System.err);
 				}

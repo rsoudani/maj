@@ -614,7 +614,7 @@ public final class TypeDefinitionExtendibleEnumerationImpl
 			throw new EndOfDataException("Not enough bytes available in the provided buffer to create a extendible enumeration value.");
 
 		AUID enumKey = AUIDImpl.createFromBuffer(buffer);
-		// System.err.println("Key for enumeration " + getName() + ": " + enumKey.toString());
+		// log.warn("Key for enumeration " + getName() + ": " + enumKey.toString());
 		return createValue(enumKey);
 	}
 	

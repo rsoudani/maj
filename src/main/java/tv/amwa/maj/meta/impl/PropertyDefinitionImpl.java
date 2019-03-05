@@ -77,6 +77,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -132,7 +133,7 @@ import tv.amwa.maj.util.Utilities;
  *
  *
  */
-
+@Slf4j
 @MediaClass(uuid1 = 0x0d010101, uuid2 = 0x0202, uuid3 = 0x0000,
 		  uuid4 = {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x06, 0x01, 0x01},
 		  definedName = "PropertyDefinition",
@@ -489,7 +490,7 @@ public class PropertyDefinitionImpl
 	public MethodBag getMethodBag() {
 		
 		if (memberOf == null)
-			System.err.println("*-*-*: " + getName());
+			log.warn("*-*-*: " + getName());
 		if (methodBag == null)
 			methodBag = TypeDefinitionImpl.makeMethodBagForType(
 					getTypeDefinition(),
@@ -680,10 +681,10 @@ public class PropertyDefinitionImpl
 			String namespace,
 			String prefix) {
 		
-//		System.out.println(getMemberOf().getName() + " : " + getName());
+//		log.info(getMemberOf().getName() + " : " + getName());
 		
 //		if (getName().equals("PrivateInformation")) {
-//			System.err.println(this.toString());
+//			log.warn(this.toString());
 //			return;
 //		}
 		
@@ -698,7 +699,7 @@ public class PropertyDefinitionImpl
 				"Type", typeName);
 		if (getTypeDefinition() == null) {
 			XMLBuilder.appendComment(propertyElement, "Warning: Unable to resolve type at runtime.");
-			System.err.println("Unable to resolve type name " + typeName + " for property " + 
+			log.warn("Unable to resolve type name " + typeName + " for property " +
 					getMemberOf().getName() + "." + getName() + "." );
 		}
 		XMLBuilder.appendElement(propertyElement, namespace, prefix, 

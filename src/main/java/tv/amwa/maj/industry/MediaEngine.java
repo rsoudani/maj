@@ -91,6 +91,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedMap;
 
+import lombok.extern.slf4j.Slf4j;
 import tv.amwa.maj.constant.CommonConstants;
 import tv.amwa.maj.exception.BadParameterException;
 import tv.amwa.maj.exception.IllegalPropertyException;
@@ -140,6 +141,7 @@ import tv.amwa.maj.record.AUID;
  * @see tv.amwa.maj.meta.ClassDefinition
  *
  */
+@Slf4j
 public final class MediaEngine 
 	implements
 		CommonConstants {
@@ -184,7 +186,7 @@ public final class MediaEngine
 				Warehouse.registerExtendibleEnumerationElements(extEnum);
 		}
 		catch (Exception e) { 
-			System.err.println("Unexpected exception in static initilizer for ExtensibleEnumerationFactory.");
+			log.warn("Unexpected exception in static initilizer for ExtensibleEnumerationFactory.");
 			e.printStackTrace(System.err);
 			System.exit(1);
 		}
@@ -194,7 +196,7 @@ public final class MediaEngine
 //		long endTime = System.currentTimeMillis();
 		aafInitialized = true;
 		
-		// System.out.println("INFO: AAF classes registered in " + (endTime - startTime) + "ms.");
+		// log.info("INFO: AAF classes registered in " + (endTime - startTime) + "ms.");
 	}
 	
 	private final static void buildBaselineClasses() {
@@ -412,7 +414,7 @@ public final class MediaEngine
 			PropertyValue firstValue = firstValues.get(firstProperty);
 			PropertyValue secondValue = secondValues.get(firstProperty);
 //			if (firstProperty.getName().equals("ByteOrder"))
-//				System.out.println("Checking " + firstProperty.getName());
+//				log.info("Checking " + firstProperty.getName());
 			if (!firstValue.equals(secondValue)) return false;
 		}
 		
@@ -518,7 +520,7 @@ public final class MediaEngine
 			metaClass.getProperties(value);
 		
 //		for ( PropertyDefinition propDef : propertyValues.keySet() )
-//			System.out.println(propDef.getName() + " = " + propertyValues.get(propDef).hashCode());
+//			log.info(propDef.getName() + " = " + propertyValues.get(propDef).hashCode());
 		
 		int hashCode = 0;
 		for ( PropertyValue propertyValue : propertyValues.values() ) 
@@ -704,7 +706,7 @@ public final class MediaEngine
 			IllegalArgumentException {
 		
 //		if (target instanceof ApplicationObject)
-//			System.out.println(((ApplicationObject) target).getBaseClass());
+//			log.info(((ApplicationObject) target).getBaseClass());
 		return Warehouse.lookForClass(target.getClass());
 	}
 	

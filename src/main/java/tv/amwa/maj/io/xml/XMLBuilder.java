@@ -97,6 +97,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
@@ -164,6 +165,7 @@ import tv.amwa.maj.util.Utilities;
  *
  *
  */
+@Slf4j
 public final class XMLBuilder {
 	
 	// private final static AUID dataValueTypeId = TypeDefinitionWarehouse.forName("DataValue").getAUID();
@@ -413,7 +415,7 @@ public final class XMLBuilder {
 		
 		// 
 		if (metadataObject == null) {
-			System.err.println("Unable to serialize to XML a child of element " + parent.getNodeName() + " at this time.");
+			log.warn("Unable to serialize to XML a child of element " + parent.getNodeName() + " at this time.");
 			return;
 		}
 					
@@ -766,7 +768,7 @@ public final class XMLBuilder {
 				appendElement(element, namespace, prefix, symbolName, opaqueType.getActualData(value));
 			}
 			catch (Exception e) {
-				System.err.println("Unable to create an opaque type data value due to a " + e.getClass().getName() + 
+				log.warn("Unable to create an opaque type data value due to a " + e.getClass().getName() +
 						" for a property named " + symbolName + ": " + e.getMessage());
 			}
 			
@@ -1112,7 +1114,7 @@ public final class XMLBuilder {
 //		File streamsDir = new File(parentDir, associatedAafxFile.getName() + "_streams");
 //		if (!streamsDir.exists())
 //			if (streamsDir.mkdir() == false)
-//				System.out.println("Unable to create streams directory " + streamsDir.getCanonicalPath());
+//				log.info("Unable to create streams directory " + streamsDir.getCanonicalPath());
 //		
 //		if (!streamsDir.canWrite())
 //			throw new IOException("Cannot write to the streams output directory.");
@@ -1446,7 +1448,7 @@ public final class XMLBuilder {
 		Validator validator = schema.newValidator();
 		Source xmlSource = new StreamSource(new StringReader(document));
 		
-//		System.out.println(document);
+//		log.info(document);
 		validator.validate(xmlSource);
 	}
 	
@@ -1454,6 +1456,6 @@ public final class XMLBuilder {
 		throws Exception {
 		
 		Object fromXML = XMLBuilder.createFromXML(new InputSource(new FileInputStream(args[0])));
-		System.out.println(fromXML.toString());
+		log.info(fromXML.toString());
 	}
 }

@@ -48,6 +48,7 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Vector;
 
+import lombok.extern.slf4j.Slf4j;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -91,6 +92,7 @@ import tv.amwa.maj.util.Utilities;
  * 
  *
  */
+@Slf4j
 public class MetadataObjectHandler 
 	extends MasterContentHandler
 	implements ContentHandler {
@@ -280,7 +282,7 @@ public class MetadataObjectHandler
 			}
 		}
 		catch (Exception e) {
-			System.err.println("When parsing XML, unable to set the value of property " + definingClass.getName() + "." + scanningValue.getName() +
+			log.warn("When parsing XML, unable to set the value of property " + definingClass.getName() + "." + scanningValue.getName() +
 					" because of a " + e.getClass().getName() + ": " + e.getMessage());
 		}
 		
@@ -316,7 +318,7 @@ public class MetadataObjectHandler
 				scanningValue = definingClass.lookupPropertyDefinition(localName);
 		}
 		catch (BadParameterException bpe) {
-			System.err.println("Unable to resolve property " + definingClass.getName() + "." + localName + ".");
+			log.warn("Unable to resolve property " + definingClass.getName() + "." + localName + ".");
 			return;
 		}
 		
@@ -390,7 +392,7 @@ public class MetadataObjectHandler
 		}
 		catch (IllegalArgumentException iae2) { }	
 
-		System.err.println("Unable to resolve XML reference to " + elementName + ".");
+		log.warn("Unable to resolve XML reference to " + elementName + ".");
 	}
 	
 	class ReferenceHandler
@@ -555,7 +557,7 @@ public class MetadataObjectHandler
 					endTag = null;
 				}
 				catch (Exception e) {
-					System.err.println("Unable to create an array element of type " + arrayElementType.getName() + 
+					log.warn("Unable to create an array element of type " + arrayElementType.getName() +
 							" for property " + definingClass.getName() + "." + scanningValue.getName() + " because of a " +
 							e.getClass().getName() + ": " + e.getMessage());
 				}

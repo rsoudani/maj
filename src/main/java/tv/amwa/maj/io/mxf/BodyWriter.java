@@ -415,7 +415,7 @@
 //			throw new IllegalArgumentException("Cannot set the kay alignment grid size to a negative value.");
 //
 //		if (streamList.size() > 0)
-//			System.err.println("KAG size changed after adding streams. CBR indexing may be incorrect as a result.");
+//			log.warn("KAG size changed after adding streams. CBR indexing may be incorrect as a result.");
 //
 //		this.kag = kag;
 //	}

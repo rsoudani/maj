@@ -55,6 +55,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import lombok.extern.slf4j.Slf4j;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -111,6 +112,7 @@ import tv.amwa.maj.industry.AAFSpecifiedClasses;
  *
  *
  */
+@Slf4j
 public class MasterContentHandler
 	implements ContentHandler,
 		AAFSpecifiedClasses {
@@ -257,7 +259,7 @@ public class MasterContentHandler
 			throws SAXException {
 
 		if (DIAGNOSTICS)
-			System.out.println("INFO: io.xml.MasterContentHandler: characters() called.");
+			log.info("INFO: io.xml.MasterContentHandler: characters() called.");
 	}
 
 	/** 
@@ -300,7 +302,7 @@ public class MasterContentHandler
 			throws SAXException {
 
 		if (DIAGNOSTICS)
-			System.out.println("INFO: io.xml.MasterContentHandler: endPrefixMapping() called.");
+			log.info("INFO: io.xml.MasterContentHandler: endPrefixMapping() called.");
 	}
 
 	/** 
@@ -313,7 +315,7 @@ public class MasterContentHandler
 			throws SAXException {
 
 		if (DIAGNOSTICS)
-			System.out.println("INFO: io.xml.MasterContentHandler: ignorableWhitespace() called.");
+			log.info("INFO: io.xml.MasterContentHandler: ignorableWhitespace() called.");
 	}
 
 	/** 
@@ -325,7 +327,7 @@ public class MasterContentHandler
 			throws SAXException {
 
 		if (DIAGNOSTICS)
-			System.out.println("INFO: io.xml.MasterContentHandler: processingInstruction() called.");
+			log.info("INFO: io.xml.MasterContentHandler: processingInstruction() called.");
 	}
 
 	/** 
@@ -335,7 +337,7 @@ public class MasterContentHandler
 			Locator locator) {
 
 		if (DIAGNOSTICS)
-			System.out.println("INFO: io.xml.MasterContentHandler: setDocumentLocator() called.");
+			log.info("INFO: io.xml.MasterContentHandler: setDocumentLocator() called.");
 	}
 
 	/** 
@@ -346,7 +348,7 @@ public class MasterContentHandler
 			throws SAXException {
 
 		if (DIAGNOSTICS)
-			System.out.println("INFO: io.xml.MasterContentHandler: skippedEntity() called.");
+			log.info("INFO: io.xml.MasterContentHandler: skippedEntity() called.");
 
 	}
 
@@ -357,7 +359,7 @@ public class MasterContentHandler
 			throws SAXException {
 
 		if (DIAGNOSTICS)
-			System.out.println("INFO: io.xml.MasterContentHandler: startDocument() called.");
+			log.info("INFO: io.xml.MasterContentHandler: startDocument() called.");
 	}
 
 	/**
@@ -425,13 +427,13 @@ public class MasterContentHandler
 		} 
 		catch (InstantiationException e) {
 			if (DIAGNOSTICS) {
-				System.err.println("Could not instanciate a handler for " + elementName + ": " + e.getMessage());
+				log.warn("Could not instanciate a handler for " + elementName + ": " + e.getMessage());
 				e.printStackTrace();
 			}
 		} 
 		catch (IllegalAccessException e) {
 			if (DIAGNOSTICS) {
-				System.err.println("Could not instanciate a handler for " + elementName + " due to an illegal access exception: " + e.getMessage());
+				log.warn("Could not instanciate a handler for " + elementName + " due to an illegal access exception: " + e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -450,7 +452,7 @@ public class MasterContentHandler
 			throws SAXException {
 		
 		if (DIAGNOSTICS)
-			System.out.println("INFO: io.xml.MasterContentHandler: startPrefixMapping() called.");
+			log.info("INFO: io.xml.MasterContentHandler: startPrefixMapping() called.");
 	}
 	
 	/**
@@ -515,14 +517,14 @@ public class MasterContentHandler
 		catch (IllegalArgumentException e) {
 			// Element name could not be extracted, so return false
 			if (DIAGNOSTICS) {
-				System.err.println("Could not register class " + handler.getClass().getName() + " due to an illegal argument exception: " + e.getMessage());
+				log.warn("Could not register class " + handler.getClass().getName() + " due to an illegal argument exception: " + e.getMessage());
 				e.printStackTrace();
 			}
 		} 
 		catch (IllegalAccessException e) {
 			// Element name could not be extracted, so return false
 			if (DIAGNOSTICS) {
-				System.err.println("Could not register class " + handler.getClass().getName() + " due to an illegal access exception: " + e.getMessage());
+				log.warn("Could not register class " + handler.getClass().getName() + " due to an illegal access exception: " + e.getMessage());
 				e.printStackTrace();
 			}
 			throw new IllegalArgumentException("The given handler does not contain an accessible elementName static string value.");
@@ -530,7 +532,7 @@ public class MasterContentHandler
 		catch (SecurityException e) {
 			// Element name could not be extracted, so return false
 			if (DIAGNOSTICS) {
-				System.err.println("Could not register class " + handler.getClass().getName() + " due to a security exception: " + e.getMessage());
+				log.warn("Could not register class " + handler.getClass().getName() + " due to a security exception: " + e.getMessage());
 				e.printStackTrace();
 			}
 			throw new IllegalArgumentException("The given handler does not contain an accessible elementName static string value.");
@@ -538,7 +540,7 @@ public class MasterContentHandler
 		catch (NoSuchFieldException e) {
 			// Element name could not be extracted, so return false
 			if (DIAGNOSTICS) {
-				System.err.println("Could not register class " + handler.getClass().getName() + " as the element name field is not present.");
+				log.warn("Could not register class " + handler.getClass().getName() + " as the element name field is not present.");
 				e.printStackTrace();
 			}
 			throw new IllegalArgumentException("The given handler does not contain an accessible elementName static string value.");
@@ -566,7 +568,7 @@ public class MasterContentHandler
 			if (Modifier.isAbstract(innerClass.getModifiers())) continue;
 			if (LocalHandler.class.isAssignableFrom(innerClass)) {
 				registerHandler((Class<? extends LocalHandler>) innerClass);
-				// System.out.println(innerClass.getCanonicalName());
+				// log.info(innerClass.getCanonicalName());
 			}
 		}
 	}
@@ -597,17 +599,17 @@ public class MasterContentHandler
 			}
 			catch (ClassCastException cce) {
 				if (DIAGNOSTICS) {
-					System.err.println("Could not register a core class for the master content handler due to a class cast exception: " + cce.getMessage());
+					log.warn("Could not register a core class for the master content handler due to a class cast exception: " + cce.getMessage());
 					cce.printStackTrace();
 				}
 			} catch (SecurityException e) {
 				if (DIAGNOSTICS) {
-					System.err.println("Could not register a core class for the master content handler due to a security exception: " + e.getMessage());
+					log.warn("Could not register a core class for the master content handler due to a security exception: " + e.getMessage());
 					e.printStackTrace();
 				}
 			} catch (IllegalArgumentException e) {
 				if (DIAGNOSTICS) {
-					System.err.println("Could not register a core class for the master content handler due to an illegal argument exception: " + e.getMessage());
+					log.warn("Could not register a core class for the master content handler due to an illegal argument exception: " + e.getMessage());
 					e.printStackTrace();
 				}
 			}

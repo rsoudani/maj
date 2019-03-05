@@ -364,7 +364,7 @@ public abstract class LocalHandler
 			existingElements.add(new String(ch, start, length));
 			
 //			if (currentElementName.equals("DefinitionObjectIdentification"))
-//				System.out.println("Added: " + new String(ch, start, length) + " start: " + start + " length : " + length);
+//				log.info("Added: " + new String(ch, start, length) + " start: " + start + " length : " + length);
 			
 			elementAttributes.put(currentElementName, makeAttributeMap(currentElementAttributes));
 		}

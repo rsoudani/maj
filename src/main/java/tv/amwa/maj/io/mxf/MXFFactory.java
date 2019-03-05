@@ -18,6 +18,7 @@ package tv.amwa.maj.io.mxf;
 
 import java.io.IOException;
 
+import lombok.extern.slf4j.Slf4j;
 import tv.amwa.maj.industry.MediaEngine;
 import tv.amwa.maj.industry.Warehouse;
 import tv.amwa.maj.io.mxf.impl.DeltaEntryImpl;
@@ -39,6 +40,7 @@ import tv.amwa.maj.meta.impl.TypeDefinitionRecordImpl;
  *
  *
  */
+@Slf4j
 public class MXFFactory {
 
 	static {
@@ -68,18 +70,18 @@ public class MXFFactory {
 
 		try {
 			if (mxfFile.open(fileName, false)) {
-				System.out.println("MXF file " + fileName + " opened successfully. Run-in size is " + mxfFile.getRunInSize() + ".");
+				log.info("MXF file " + fileName + " opened successfully. Run-in size is " + mxfFile.getRunInSize() + ".");
 			}
 			else {
-				System.err.println("Could not open file " + fileName + ".");
+				log.warn("Could not open file " + fileName + ".");
 				return null;
 			}
 			mxfFile.readRunIn();
 			boolean partitionsRead = mxfFile.buildPartitionsTable();
-			// System.out.println("Read " + mxfFile.countPartitions() + " partitions from the file.");
+			// log.info("Read " + mxfFile.countPartitions() + " partitions from the file.");
 		}
 		catch (Exception e) {
-			System.err.println(e.getClass().getName() + " when reading file \'" + fileName + "\': " + e.getMessage());
+			log.warn(e.getClass().getName() + " when reading file \'" + fileName + "\': " + e.getMessage());
 			e.printStackTrace();
 		}
 
@@ -283,11 +285,11 @@ public class MXFFactory {
 		throws Exception {
 
 		if (args.length < 1) {
-			System.err.println("Please provide the name of an MXF file to analyse.");
+			log.warn("Please provide the name of an MXF file to analyse.");
 			System.exit(1);
 		}
 
 		String fileName = args[0];
-		System.out.println(dumpFile(fileName));
+		log.info(dumpFile(fileName));
 	}
 }

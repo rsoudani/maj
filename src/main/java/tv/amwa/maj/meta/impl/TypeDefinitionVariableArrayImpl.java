@@ -85,6 +85,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -132,6 +133,7 @@ import tv.amwa.maj.util.Utilities;
 		  definedName = "TypeDefinitionVariableArray",
 		  description = "The TypeDefinitionVariableArray class defines a property type that has a varying number of values of the underlying type. The order of the values is meaningful.",
 		  symbol = "TypeDefinitionVariableArray")
+@Slf4j
 public final class TypeDefinitionVariableArrayImpl 
 	extends 
 		TypeDefinitionImpl 
@@ -403,7 +405,7 @@ public final class TypeDefinitionVariableArrayImpl
 				InvocationTargetException {
 			
 			if (clear == null) 
-				System.err.println("Unable to call clear method for varaible array property " + getPropertyName() + ".");
+				log.warn("Unable to call clear method for varaible array property " + getPropertyName() + ".");
 			else
 				clear.invoke(metadataObject);
 		}
@@ -1162,7 +1164,7 @@ public final class TypeDefinitionVariableArrayImpl
 					setValue.add(x, referenceMap.get(unresolvedReference.getValue()));
 				}
 				else {
-					System.err.println("Unable to resolve reference " + unresolvedReference.getValue().toString() +
+					log.warn("Unable to resolve reference " + unresolvedReference.getValue().toString() +
 							" for a varialbe array.");
 					allResolved = false;
 				}

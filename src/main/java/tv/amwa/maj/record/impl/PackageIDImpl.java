@@ -92,6 +92,7 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Calendar;
 
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -170,6 +171,7 @@ import tv.amwa.maj.util.Utilities;
  * @see tv.amwa.maj.industry.TypeDefinitions#PackageIDType
  * @see tv.amwa.maj.misctype.PackageIDType
  */
+@Slf4j
 public final class PackageIDImpl 
 	implements PackageID,
 		Serializable,
@@ -523,7 +525,7 @@ public final class PackageIDImpl
     		md = MessageDigest.getInstance("MD5");
     	}
     	catch (NoSuchAlgorithmException nsae) {
-    		System.err.println("Unexpected: MD5 algorithm not available in method tv.amwa.maj.entity.packageID.materialGenerationMasked(). Please investigate.");
+    		log.warn("Unexpected: MD5 algorithm not available in method tv.amwa.maj.entity.packageID.materialGenerationMasked(). Please investigate.");
     		return new AUIDImpl(unmasked);
     	}
 

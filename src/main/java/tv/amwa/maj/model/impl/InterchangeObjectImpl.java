@@ -361,7 +361,7 @@ public class InterchangeObjectImpl
 	public InterchangeObject clone() {
 		
 		try {
-			// System.out.println("About to clone a " + getClass().getName());
+			// log.info("About to clone a " + getClass().getName());
 			// (new Exception()).printStackTrace();
 			return (InterchangeObject) super.clone();
 		}

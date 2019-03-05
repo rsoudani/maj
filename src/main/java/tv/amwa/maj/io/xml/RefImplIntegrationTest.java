@@ -16,9 +16,10 @@
 
  package tv.amwa.maj.io.xml;
 
+import lombok.extern.slf4j.Slf4j;
 import tv.amwa.maj.io.aaf.AAFFactory;
 import tv.amwa.maj.model.Preface;
-
+@Slf4j
 public class RefImplIntegrationTest {
 
 	/**
@@ -29,13 +30,13 @@ public class RefImplIntegrationTest {
 		// TODO Auto-generated method stub
 		Preface preface = AAFFactory.readPreface(args[0]);
 
-//		System.out.println(preface.getDictionaries().toString());
+//		log.info(preface.getDictionaries().toString());
 //		File outputFile = new File(args[1]);
 
 		AAFElement documentRoot = new AAFElement(preface);
 		String asXML = XMLBuilder.toXMLNonMetadata(documentRoot);
 
-		System.out.println(asXML.substring(0, 10000));
+		log.info(asXML.substring(0, 10000));
 //
 //		FileWriter fileWriter = new FileWriter(outputFile);
 //		fileWriter.write(asXML);

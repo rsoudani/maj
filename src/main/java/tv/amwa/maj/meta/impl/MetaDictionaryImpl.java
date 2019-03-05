@@ -57,6 +57,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 
+import lombok.extern.slf4j.Slf4j;
 import tv.amwa.maj.constant.CommonConstants;
 import tv.amwa.maj.exception.BadParameterException;
 import tv.amwa.maj.exception.InvalidParameterException;
@@ -105,6 +106,7 @@ import tv.amwa.maj.record.AUID;
 		symbol = "MetaDictionary",
 		namespace = CommonConstants.AAF_XML_NAMESPACE,
 		prefix = CommonConstants.AAF_XML_PREFIX)
+@Slf4j
 public class MetaDictionaryImpl 
 	implements 
 		MetaDictionary,
@@ -341,7 +343,7 @@ public class MetaDictionaryImpl
 			addClassHierarchy(appObject.getObjectClass());
 			values = ((ApplicationObject) mdObject).getProperties();
 			for ( PropertyDefinition property : values.keySet() ) {
-//				System.out.println("*+*: Processing meta property definition :" + property.getName());
+//				log.info("*+*: Processing meta property definition :" + property.getName());
 				typeDefinitions.add(property.getTypeDefinition());
 				
 				ClassDefinition memberOf = property.getMemberOf();
@@ -356,7 +358,7 @@ public class MetaDictionaryImpl
 								toBeWrittenMemberOf.lookupPropertyDefinition(property.getAUID());
 							}
 							catch (BadParameterException bpe) {
-//								System.out.println("*+*: Adding property " + property.getName() + " to class " + toBeWrittenMemberOf.getName());
+//								log.info("*+*: Adding property " + property.getName() + " to class " + toBeWrittenMemberOf.getName());
 								((ClassDefinitionImpl) toBeWrittenMemberOf).addPropertyDefinition(property);
 							}
 						}
@@ -372,7 +374,7 @@ public class MetaDictionaryImpl
 			for ( PropertyDefinition property : targetClass.getAllPropertyDefinitions() ) {
 				TypeDefinition propertyType = property.getTypeDefinition();
 				if (propertyType == null) 
-					System.err.println("When making a dynamic preface, adding null type for property '" + targetClass.getName() + ":" +
+					log.warn("When making a dynamic preface, adding null type for property '" + targetClass.getName() + ":" +
 							property.getName() + "'.");
 				typeDefinitions.add(propertyType);
 			}
@@ -385,7 +387,7 @@ public class MetaDictionaryImpl
 			
 			TypeDefinition type = property.getTypeDefinition();
 			if (type == null) 
-				System.err.println("When making a dynamic preface, adding null type for property '" + property.getName() + "'.");
+				log.warn("When making a dynamic preface, adding null type for property '" + property.getName() + "'.");
 			typeDefinitions.add(type);
 			PropertyValue value = null;
 			
@@ -401,7 +403,7 @@ public class MetaDictionaryImpl
 			case VariableArray:
 				TypeDefinitionVariableArray arrayType = (TypeDefinitionVariableArray) type;
 				TypeDefinition arrayRefType = arrayType.getType();
-				if (arrayRefType == null) System.err.println("When making a dynamic preface, adding null sub type for array ref property '" + property.getName() + "'.");
+				if (arrayRefType == null) log.warn("When making a dynamic preface, adding null sub type for array ref property '" + property.getName() + "'.");
 				typeDefinitions.add(arrayRefType);
 				
 				value = values.get(property);
@@ -415,7 +417,7 @@ public class MetaDictionaryImpl
 				TypeDefinitionSet setType = (TypeDefinitionSet) type;
 				TypeDefinition setRefType = setType.getElementType();
 				typeDefinitions.add(setRefType);
-				if (setRefType == null) System.err.println("When making a dynamic preface, adding null sub type for set ref property '" + property.getName() + "'.");
+				if (setRefType == null) log.warn("When making a dynamic preface, adding null sub type for set ref property '" + property.getName() + "'.");
 				value = values.get(property);
 				Set<Object> elements = ((SetValue) value).getValue();
 				
@@ -425,14 +427,14 @@ public class MetaDictionaryImpl
 				break;
 			case FixedArray:
 				TypeDefinition fixedRefType = ((TypeDefinitionFixedArray) type).getType();
-				if (fixedRefType == null) System.err.println("When making a dynamic preface, adding null sub type for fixed ref property '" + property.getName() + "'.");
+				if (fixedRefType == null) log.warn("When making a dynamic preface, adding null sub type for fixed ref property '" + property.getName() + "'.");
 				typeDefinitions.add(fixedRefType);
 				break;
 			case Indirect:
 				value = values.get(property);
 				PropertyValue indirectValue = ((IndirectValue) value).getValue();
 				TypeDefinition indirectType = indirectValue.getType();
-				if (indirectType == null) System.err.println("When making a dynamic preface, adding null sub type for indirect property '" + property.getName() + "'.");
+				if (indirectType == null) log.warn("When making a dynamic preface, adding null sub type for indirect property '" + property.getName() + "'.");
 				typeDefinitions.add(indirectType);
 				if (indirectValue.getValue() instanceof MetadataObject)
 					addMetaDefinitions((MetadataObject) indirectValue.getValue());

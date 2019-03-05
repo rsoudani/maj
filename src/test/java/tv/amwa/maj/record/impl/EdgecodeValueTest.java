@@ -211,7 +211,7 @@ public class EdgecodeValueTest {
 	@Ignore @Test public void toXML() { // FIXME make this test pass on windows
 		
 		String asXML = XMLBuilder.toXMLNonMetadata((XMLSerializable) edgecode);
-		// System.out.println(asXML);
+		// log.info(asXML);
 		assertTrue(asXML.contains("<aaf:EdgecodeValue xmlns:aaf=\"http://www.smpte-ra.org/schemas/2001-2/2007/aaf\">\n" +
 				"  <aaf:EdgeCodeStart>321</aaf:EdgeCodeStart>\n" +
 				"  <aaf:FilmKind>Ft35MM</aaf:FilmKind>\n" +

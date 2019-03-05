@@ -66,6 +66,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import lombok.extern.slf4j.Slf4j;
 import tv.amwa.maj.constant.OperationConstant;
 import tv.amwa.maj.constant.OperationDescription;
 import tv.amwa.maj.exception.ObjectAlreadyAttachedException;
@@ -114,6 +115,7 @@ import tv.amwa.maj.record.impl.AUIDImpl;
 		  definedName = "OperationDefinition",
 		  description = "The OperationDefinition class identifies an operation that is performed on an array of Segments.",
 		  symbol = "OperationDefinition")
+@Slf4j
 public class OperationDefinitionImpl
 	extends 
 		DefinitionObjectImpl
@@ -195,7 +197,7 @@ public class OperationDefinitionImpl
 					if (parameter != null)
 						definedOperation.addParameterDefinition(parameter);
 					else
-						System.err.println("Could not find parameter " + parameterName + " for operation " + definedOperation.getName() + ".");
+						log.warn("Could not find parameter " + parameterName + " for operation " + definedOperation.getName() + ".");
 				}
 		
 				for ( String operationName : operationMetadata.degradeTo() ) {
@@ -204,12 +206,12 @@ public class OperationDefinitionImpl
 					if (operation != null)
 						definedOperation.appendDegradeToOperation(operation);
 					else
-						System.err.println("Could not find degrade to operation " + operationName + " for operation " + definedOperation.getName() + ".");
+						log.warn("Could not find degrade to operation " + operationName + " for operation " + definedOperation.getName() + ".");
 				}
 				
 				definedOperation.setIsTimeWarp(operationMetadata.isTimeWarp());
 				
-				// System.out.println(definedOperation.toString());
+				// log.info(definedOperation.toString());
 				
 				registerOperationDefinition(definedOperation);
 			

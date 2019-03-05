@@ -135,7 +135,7 @@ public class DataDefinitionImpl
 				if (dataDefinitionMetadata.description().length() > 0)
 					definedDataDefinition.setDescription(dataDefinitionMetadata.description());
 		
-				// System.out.println(definedDataDefinition.toString());
+				// log.info(definedDataDefinition.toString());
 				
 				registerDataDefinition(definedDataDefinition);
 			

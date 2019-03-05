@@ -159,7 +159,7 @@ public class ParameterDefinitionImpl
 				if (parameterMetadata.displayUnits().length() > 0)
 					definedParameter.setParameterDisplayUnits(parameterMetadata.displayUnits());
 		
-				// System.out.println(definedParameter.toString());
+				// log.info(definedParameter.toString());
 				
 				registerParameterDefinition(definedParameter);
 			

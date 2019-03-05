@@ -16,9 +16,10 @@
 
 package tv.amwa.maj.io.aaf;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.poifs.filesystem.POIFSWriterEvent;
 import org.apache.poi.poifs.filesystem.POIFSWriterListener;
-
+@Slf4j
 public class AAFTestWrite {
 
 	static class ReaderListener
@@ -27,7 +28,7 @@ public class AAFTestWrite {
 		public void processPOIFSWriterEvent(
 				POIFSWriterEvent event) {
 
-			System.err.println(event.getPath());
+			log.warn(event.getPath().toString());
 		}
 
 	}

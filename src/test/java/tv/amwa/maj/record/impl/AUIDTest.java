@@ -290,7 +290,7 @@ public class AUIDTest {
 
 		AUIDImpl testAuid1 = new AUIDImpl();
 		AUIDImpl testAuid2 = new AUIDImpl();
-		// System.out.println(testAuid1.toString());
+		// log.info(testAuid1.toString());
 
 		assertEquals(testAuid1.isNil(), false);
 		assertEquals(testAuid2.isNil(), false);

@@ -275,7 +275,7 @@ public abstract class PartitionImpl
 		
 		writePartitionPack();
 		
-//		System.out.println("Header byte count in index partition is " + getPartitionPack().getHeaderByteCount());
+//		log.info("Header byte count in index partition is " + getPartitionPack().getHeaderByteCount());
 		
 		localMXFFile.seek(endOfPartitionPack + getPartitionPack().getHeaderByteCount());
 		localMXFFile.write(indexBuffer);		

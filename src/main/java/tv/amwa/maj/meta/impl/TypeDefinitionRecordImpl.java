@@ -703,7 +703,7 @@ public final class TypeDefinitionRecordImpl
 			if (method.getName().equalsIgnoreCase(expectedMethod)) {
 				
 				try {
-//					System.out.println("Method: " + method.getName() + " on " + recordProperty.toString() + " with " +
+//					log.info("Method: " + method.getName() + " on " + recordProperty.toString() + " with " +
 //							memberProperty.getValue().toString());
 					method.invoke(recordProperty.getValue(), memberProperty.getValue());
 					return;

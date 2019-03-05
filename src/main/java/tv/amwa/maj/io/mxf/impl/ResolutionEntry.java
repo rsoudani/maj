@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import lombok.extern.slf4j.Slf4j;
 import tv.amwa.maj.industry.MetadataObject;
 import tv.amwa.maj.industry.PropertyValue;
 import tv.amwa.maj.meta.ClassDefinition;
@@ -34,6 +35,7 @@ import tv.amwa.maj.meta.impl.TypeDefinitionVariableArrayImpl;
 import tv.amwa.maj.record.AUID;
 import tv.amwa.maj.record.impl.AUIDImpl;
 
+@Slf4j
 public class ResolutionEntry {
 
 	private PropertyDefinition property;
@@ -56,8 +58,8 @@ public class ResolutionEntry {
 			Map<AUIDImpl, MetadataObject> referenceTable) {
 
 //		if (property.getName().equals("PackageTracks"))
-//			System.out.println("Resolving package track objects.");
-//		System.out.println(property.getName());
+//			log.info("Resolving package track objects.");
+//		log.info(property.getName());
 
 		boolean resolutionComplete = true;
 		PropertyValue resolvedReference;
@@ -84,13 +86,13 @@ public class ResolutionEntry {
 					injectionPoint.set(target, resolvedReference.getValue());
 				}
 				catch (Exception e) {
-					System.err.println("Could not inject a value into property " + property.getName() + ".");
+					log.warn("Could not inject a value into property " + property.getName() + ".");
 					property.setPropertyValue(target, resolvedReference);
 				}
 				return true;
 			}
 
-			System.err.println("Cannot resolve strong reference for property " + property.getName() + ".");
+			log.warn("Cannot resolve strong reference for property " + property.getName() + ".");
 			return false;
 
 		case Set:
@@ -109,7 +111,7 @@ public class ResolutionEntry {
 					continue;
 				}
 
-				System.err.println("Unable to resolve a set reference for property " + property.getName() + ".");
+				log.warn("Unable to resolve a set reference for property " + property.getName() + ".");
 				resolutionComplete = false;
 			}
 
@@ -119,7 +121,7 @@ public class ResolutionEntry {
 				injectionPoint.set(target, injectionSet);
 			}
 			catch (Exception e) {
-				System.err.println("Could not inject a value into property " + property.getName() + ".");
+				log.warn("Could not inject a value into property " + property.getName() + ".");
 				property.setPropertyValue(target, property.getTypeDefinition().createValue(resolvedValues));
 			}
 
@@ -141,7 +143,7 @@ public class ResolutionEntry {
 					continue;
 				}
 
-				System.err.println("Unable to resolve a variable array reference for property " + property.getName() + ".");
+				log.warn("Unable to resolve a variable array reference for property " + property.getName() + ".");
 				resolutionComplete = false;
 			}
 
@@ -151,7 +153,7 @@ public class ResolutionEntry {
 				injectionPoint.set(target, injectionList);
 			}
 			catch (Exception e) {
-				System.err.println("Could not inject a value into property " + property.getName() + ".");
+				log.warn("Could not inject a value into property " + property.getName() + ".");
 				property.setPropertyValue(
 					target,
 					property.getTypeDefinition().createValue(resolvedListValues));

@@ -64,6 +64,8 @@
 
 package tv.amwa.maj.util;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -84,7 +86,7 @@ import java.util.Hashtable;
  * 
  *
  */
-
+@Slf4j
 public final class Utilities {
 
 	/** Hashtable reprsenting table 2 of SMPTE S309M-1999, mapping from millisecond offset from UTC
@@ -829,7 +831,7 @@ public final class Utilities {
 					nextLine.append('.');
 			}
 			
-			System.out.println(nextLine.toString());
+			log.info(nextLine.toString());
 			count += 16;
 		}
 		

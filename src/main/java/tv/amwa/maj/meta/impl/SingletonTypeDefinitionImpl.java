@@ -47,6 +47,7 @@ package tv.amwa.maj.meta.impl;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import lombok.extern.slf4j.Slf4j;
 import tv.amwa.maj.industry.HiddenClass;
 import tv.amwa.maj.industry.MediaPropertySetter;
 import tv.amwa.maj.industry.MetadataObject;
@@ -62,6 +63,7 @@ import tv.amwa.maj.meta.PropertyDefinition;
  *
  *
  */
+@Slf4j
 @HiddenClass
 public abstract class SingletonTypeDefinitionImpl 
 	extends TypeDefinitionImpl {
@@ -105,7 +107,7 @@ public abstract class SingletonTypeDefinitionImpl
 		
 			// FIXME problem setting blobs, second time around only!
 			if (setter == null) {
-				System.err.println("*** Found a null setter: " + getPropertyName());
+				log.warn("*** Found a null setter: " + getPropertyName());
 				return;
 			}
 			// Avoid trying to set a primitive value with a null

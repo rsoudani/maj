@@ -60,6 +60,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import lombok.extern.slf4j.Slf4j;
 import tv.amwa.maj.constant.CodingEquationsType;
 import tv.amwa.maj.constant.ColorPrimariesType;
 import tv.amwa.maj.constant.CommonConstants;
@@ -174,6 +175,7 @@ import tv.amwa.maj.record.impl.AUIDImpl;
  * @see tv.amwa.maj.meta.ClassDefinition
  * @see tv.amwa.maj.meta.TypeDefinition
  */
+@Slf4j
 public final class Warehouse {
 	
 	// This is the authoritative list of class definitions known to this MAJ instance
@@ -369,7 +371,7 @@ public final class Warehouse {
 				ClassDefinition checkBeforeRemoving = nameToClass.get(alias);
 				if ((alias.equals(checkBeforeRemoving.getName())) ||
 						(alias.equals(checkBeforeRemoving.getSymbol()))) {
-					System.err.println("Warning: Cannot use alias " + alias + " for class " + 
+					log.warn("Warning: Cannot use alias " + alias + " for class " +
 							severalNames.getName() + " because it clashes with another property name or symbol.");
 					continue;
 				}
@@ -906,7 +908,7 @@ public final class Warehouse {
 		
 		for ( Field field : typeClass.getFields() ) {
 		
-			// System.out.println(field.getName());
+			// log.info(field.getName());
 			
 			int modifiers = field.getModifiers();
 			if ((!Modifier.isPublic(modifiers)) || (!Modifier.isStatic(modifiers))) continue;
@@ -923,7 +925,7 @@ public final class Warehouse {
 		}
 	
 		/* for ( String typeName : knownTypes.keySet() )
-			if (typeName.contains("SourceReference")) System.out.println(typeName); */
+			if (typeName.contains("SourceReference")) log.info(typeName); */
 	}
 
 	/**

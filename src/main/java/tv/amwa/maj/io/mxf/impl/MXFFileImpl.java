@@ -82,6 +82,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import lombok.extern.slf4j.Slf4j;
 import tv.amwa.maj.exception.BadParameterException;
 import tv.amwa.maj.exception.EndOfDataException;
 import tv.amwa.maj.exception.InsufficientSpaceException;
@@ -123,6 +124,7 @@ import tv.amwa.maj.record.impl.AUIDImpl;
  *
  *
  */
+@Slf4j
 public class MXFFileImpl 
 	implements 
 		MXFFile,
@@ -213,7 +215,7 @@ public class MXFFileImpl
 		fileHandle = fileHandle.getAbsoluteFile();
 		
 		if (!fileHandle.exists())
-			System.err.println("File " + fileHandle.toString() + " does not exist!");
+			log.warn("File " + fileHandle.toString() + " does not exist!");
 		
 		try {
 			fileChannel = (new RandomAccessFile(fileHandle, readOnly ? "r" : "rw")).getChannel();
@@ -294,7 +296,7 @@ public class MXFFileImpl
 		}
 		catch (IOException ioe) {
 			if (isOpen) {
-				System.err.println("Failed to close MXF file " + fileHandle.getName() + 
+				log.warn("Failed to close MXF file " + fileHandle.getName() +
 						" with IO exception: " + ioe.getMessage());
 				return false;
 			}
@@ -379,7 +381,7 @@ public class MXFFileImpl
 			}
 		}
 		
-		System.err.println("Cannot find a valid key in the first 65536 bytes in file " + getName() + ".");
+		log.warn("Cannot find a valid key in the first 65536 bytes in file " + getName() + ".");
 		fileChannel.position(0);
 		return false;
 	}
@@ -451,7 +453,7 @@ public class MXFFileImpl
 			
 			for ( RandomIndexItem item : fileRIP.getPartitionIndex() ) {
 				
-				// System.out.println("Reading RIP item: " + item.toString());
+				// log.info("Reading RIP item: " + item.toString());
 				seek(item.getByteOffset());
 				partitions.add(PartitionImpl.partitionFactory(this));
 			}
@@ -996,7 +998,7 @@ public class MXFFileImpl
 					readBuffer.flip();
 				}
 				catch (IOException ioe) {
-					System.err.println("Error reading file " + getName() + " at position 0x" + Long.toHexString(tell()) + ": " + ioe.getMessage());
+					log.warn("Error reading file " + getName() + " at position 0x" + Long.toHexString(tell()) + ": " + ioe.getMessage());
 					countBytesRead = 0;
 				}
 			}
@@ -1023,7 +1025,7 @@ public class MXFFileImpl
 				countBytesRead = fileChannel.read(fileBytes);
 			}
 			catch (IOException ioe) {
-				System.err.println("Error reading file " + getName() + " at position 0x" + Long.toHexString(tell()) + ": " + ioe.getMessage());
+				log.warn("Error reading file " + getName() + " at position 0x" + Long.toHexString(tell()) + ": " + ioe.getMessage());
 				countBytesRead = 0;
 			}
 		}
@@ -1561,7 +1563,7 @@ public class MXFFileImpl
 		ByteBuffer lengthBuffer = read(1);
 		
 		if (lengthBuffer.limit() < 1) {
-			System.err.println("Incomplete BER length in MXF file " + getName() + " at 0x" + Long.toHexString(tell()));
+			log.warn("Incomplete BER length in MXF file " + getName() + " at 0x" + Long.toHexString(tell()));
 			return -1l;
 		}
 		
@@ -1573,7 +1575,7 @@ public class MXFFileImpl
 		lengthBuffer = read(berTailLength);
 		
 		if (lengthBuffer.limit() != berTailLength) {
-			System.err.println("Incomplete BER length in MXF file " + getName() + " at 0x" + Long.toHexString(tell()));
+			log.warn("Incomplete BER length in MXF file " + getName() + " at 0x" + Long.toHexString(tell()));
 			return -1l;			
 		}
 			
@@ -1878,7 +1880,7 @@ public class MXFFileImpl
 			ByteBuffer data) {
 
 		if (bufferCurrentPosition < bufferOffset) {
-			System.err.println("Cannot write to a memory file before the buffer start.");
+			log.warn("Cannot write to a memory file before the buffer start.");
 			return 0;
 		}
 		
@@ -1918,14 +1920,14 @@ public class MXFFileImpl
 			byte[] data) {
 		
 		if (bufferCurrentPosition < bufferOffset) {
-			System.err.println("Cannot read from a memory file before the buffer start.");
+			log.warn("Cannot read from a memory file before the buffer start.");
 			return 0;
 		}
 		
 		int actualPosition = (int) (bufferCurrentPosition - bufferOffset);
 
 		if (actualPosition >= buffer.limit()) {
-			System.err.println("Cannot read beyond the end of a memory buffer.");
+			log.warn("Cannot read beyond the end of a memory buffer.");
 			return 0;
 		}
 		
@@ -2092,7 +2094,7 @@ public class MXFFileImpl
 			material.readRunIn();
 			
 			PartitionPack partitionPack = PartitionPackImpl.readPartitionPack(material);
-			System.err.println(XMLBuilder.toXML(partitionPack));
+			log.warn(XMLBuilder.toXML(partitionPack));
 			
 			long headerLimit = material.tell() + partitionPack.getHeaderByteCount();
 
@@ -2109,11 +2111,11 @@ public class MXFFileImpl
 			}
 
 			PrimerPack primerPack = readPrimerPack(material);
-//			System.out.println(XMLBuilder.toXML(primerPack));
-//			System.out.println();
+//			log.info(XMLBuilder.toXML(primerPack));
+//			log.info();
 			
 			key = material.readKey();
-			System.out.println(key.toString());
+			log.info(key.toString());
 			
 			if (MXFBuilder.isKLVFill(key)) {
 				length = material.readBER();
@@ -2143,7 +2145,7 @@ public class MXFFileImpl
 					preface = (PrefaceImpl) metadataFromFile;
 				
 //				if (metadataFromFile != null)
-//					System.out.println(XMLBuilder.toXML(metadataFromFile));
+//					log.info(XMLBuilder.toXML(metadataFromFile));
 			}
 			
 			// Resolve references
@@ -2200,16 +2202,16 @@ public class MXFFileImpl
 		try {
 			Preface preface = readPrefaceFromMXF(args[0]);
 			
-			System.out.println("Initializing AAF classes took :" + (initEndTime - initStartTime) + "ns");
+			log.info("Initializing AAF classes took :" + (initEndTime - initStartTime) + "ns");
 			long fileReadEntTime = System.nanoTime();
 			
-			System.out.println("Time to read file is " + (fileReadEntTime - initEndTime) + "ns.");
+			log.info("Time to read file is " + (fileReadEntTime - initEndTime) + "ns.");
 
-			System.out.println("\nFile as XML is:");
-			System.out.println(preface.toString());
+			log.info("\nFile as XML is:");
+			log.info(preface.toString());
 		}
 		catch (Exception e) {
-			System.err.println(e.getClass().getName() + ": " + e.getMessage());
+			log.warn(e.getClass().getName() + ": " + e.getMessage());
 			e.printStackTrace();
 		}
 

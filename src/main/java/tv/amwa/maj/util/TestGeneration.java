@@ -58,6 +58,7 @@ import java.util.SortedMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -83,6 +84,7 @@ import tv.amwa.maj.record.TimeStamp;
  *
  *
  */
+@Slf4j
 public class TestGeneration 
 	extends GenerationCore {
 
@@ -90,14 +92,14 @@ public class TestGeneration
 			String[] args) {
 		
 		if (args.length < 2) {
-			System.out.println("Usage: java tv.amwa.maj.util.TestGeneration <base_package_name> <metadictionary_XML_file>");
+			log.info("Usage: java tv.amwa.maj.util.TestGeneration <base_package_name> <metadictionary_XML_file>");
 			System.exit(1);
 		}
 		
 		DictionaryContext context = null;
 		
 		long startTime = System.currentTimeMillis();
-		System.out.println("Starting test generation for package " + args[0]);
+		log.info("Starting test generation for package " + args[0]);
 		
 		try{
 			File file = new File(args[1]);
@@ -109,26 +111,26 @@ public class TestGeneration
 				context = processRoot(node);
 			}
 			else{
-				System.out.println("File not found!");
+				log.info("File not found!");
 			}	
 		}
 		catch(Exception e){
-			System.err.println(e.getClass().getName() + " thrown: " + e.getMessage());
+			log.warn(e.getClass().getName() + " thrown: " + e.getMessage());
 			e.printStackTrace();
 		}
 
 		long dictDoneTime = System.currentTimeMillis();
-		System.out.println("Dictionary " + args[1] + " read in " + (dictDoneTime - startTime) + "ms.");
+		log.info("Dictionary " + args[1] + " read in " + (dictDoneTime - startTime) + "ms.");
 		
 		context.basePackageName = args[0];
 		
 		if (makeDirectories(context) == false) {
-			System.out.println("Unable to create the required directory structure.");
+			log.info("Unable to create the required directory structure.");
 			System.exit(1);
 		}
 		
 		long foldersCreatedTime = System.currentTimeMillis();
-		System.out.println("Folders created. Starting to generate tests from meta dictionary only for each class.");
+		log.info("Folders created. Starting to generate tests from meta dictionary only for each class.");
 		
 		boolean success = true;
 		
@@ -147,7 +149,7 @@ public class TestGeneration
 		}
 		
 		long metaTestEnd = System.currentTimeMillis();
-		System.out.println("All meta dictionary tests generated in " + (metaTestEnd - foldersCreatedTime) + "ms. Starting value tests.");
+		log.info("All meta dictionary tests generated in " + (metaTestEnd - foldersCreatedTime) + "ms. Starting value tests.");
 		
 		Warehouse.clear();
 		MediaEngine.initializeAAF();
@@ -159,7 +161,7 @@ public class TestGeneration
 				initializeMethod.invoke(null);
 			}
 			catch (Exception e) {
-				System.out.println("Unable to initialize extension due to a " + e.getClass().getName() + ": " +
+				log.info("Unable to initialize extension due to a " + e.getClass().getName() + ": " +
 						e.getMessage());
 				System.exit(1);
 			}
@@ -180,12 +182,12 @@ public class TestGeneration
 		}
 		
 		long endTime = System.currentTimeMillis();
-		System.out.println("All value tests generated in " + (endTime - metaTestEnd) + "ms.");
+		log.info("All value tests generated in " + (endTime - metaTestEnd) + "ms.");
 		if (success)
-			System.out.println("Successfully generated all files for package " + context.basePackageName + 
+			log.info("Successfully generated all files for package " + context.basePackageName +
 					" in total time " + (endTime - startTime) + "ms.");
 		else
-			System.out.println("Problem encountered generating files for package " + context.basePackageName + ".");
+			log.info("Problem encountered generating files for package " + context.basePackageName + ".");
 	}
 	
 	// Tests generated before the registration of the types
@@ -377,7 +379,7 @@ public class TestGeneration
 					addPropertyValueTests(building, property, testValue, modelInterface);
 				}
 				catch (BadParameterException bpe) {
- 					System.out.println("Unable to generate test for property " + property.name + " due to a bad parameter exception: " + bpe.getMessage());
+ 					log.info("Unable to generate test for property " + property.name + " due to a bad parameter exception: " + bpe.getMessage());
 				}
 			}
 		}
@@ -1161,22 +1163,22 @@ public class TestGeneration
 		
 		Method setter = findMethodForName(iface, methods.getSetterName());
 		if (setter == null) {
-			System.out.println("Annotated set method " + methods.getSetterName() + "() for property " + property.memberOf + "." + property.name +
+			log.info("Annotated set method " + methods.getSetterName() + "() for property " + property.memberOf + "." + property.name +
 					" is not available in interface " + iface.getCanonicalName() + ".");
 			setter = findMethodForName(iface, "set" + property.name);
 		}
 		if (setter == null) {
-			System.out.println("    Alternative method set" + property.name+ "() is also not available.");
+			log.info("    Alternative method set" + property.name+ "() is also not available.");
 			for ( String alias : propertyDefinition.getAliases() ) {
 				setter = findMethodForName(iface, "set" + alias);
 				if (setter != null) {
-					System.out.println("    Trying to set " + property.name + " with alias name " + setter.getName() + ".");
+					log.info("    Trying to set " + property.name + " with alias name " + setter.getName() + ".");
 					break;
 				}
 			}
 		}
 		if (setter == null) {
-			System.out.println("    No public interface for setting property " + property.name + " has been found.");
+			log.info("    No public interface for setting property " + property.name + " has been found.");
 			return;
 		}	
 		
@@ -1248,7 +1250,7 @@ public class TestGeneration
 				iface = Class.forName(packageName + "." + property.memberOf);
 		}
 		catch (Exception e) { 
-			System.out.println("Unabled to generate property default test for " + property.memberOf + "." + property.name +
+			log.info("Unabled to generate property default test for " + property.memberOf + "." + property.name +
 					" due to a " + e.getClass().getName() + ": " + e.getMessage());
 			return null; 
 		}
@@ -1280,17 +1282,17 @@ public class TestGeneration
 		if (iface == null) return;
 
 		TypeData elementType = typeByName(((TypeDataSet) typeData).elementType); 
-		System.out.println("*** SET *** " + typeData.name + " with elements of type " + elementType.name + ".");
+		log.info("*** SET *** " + typeData.name + " with elements of type " + elementType.name + ".");
 		
 		Method add = findMethodForName(iface, methods.getAddName());
 		if (add == null) {
-			System.out.println("No public add method for set " + property.memberOf + "." + property.name + " in interface " + iface.getCanonicalName() + ".");
+			log.info("No public add method for set " + property.memberOf + "." + property.name + " in interface " + iface.getCanonicalName() + ".");
 			return;
 		}
 		
 		Method count = findMethodForName(iface, methods.getCountName());
 		if (count == null) {
-			System.out.println("No public count method for set " + property.memberOf + "." + property.name + " in interface " + iface.getCanonicalName() + ".");
+			log.info("No public count method for set " + property.memberOf + "." + property.name + " in interface " + iface.getCanonicalName() + ".");
 		}
  			
 		building.append("@Test");
@@ -1313,7 +1315,7 @@ public class TestGeneration
 				building.append("AUID testElement = Forge.randomAUID();");
 				break;
 			}
-			System.out.println("Need to find a way to test set elements for " + typeData.name + ".");
+			log.info("Need to find a way to test set elements for " + typeData.name + ".");
 			building.decrement("}");
 			return;
 		case Int:
@@ -1321,7 +1323,7 @@ public class TestGeneration
 			building.append("int testElement = " + ((int) (Math.random() * Integer.MAX_VALUE)) + ";");
 			break;
 		default:
-			System.out.println("Need to find a way to test set elements for " + typeData.name + ".");
+			log.info("Need to find a way to test set elements for " + typeData.name + ".");
 			building.decrement("}");
 			return;
 		}
@@ -1342,7 +1344,7 @@ public class TestGeneration
 		Method clear = findMethodForName(iface, methods.getClearName());
 		if (clear == null) {
 			if (property.isOptional == true)
-				System.out.println("No public clear method for set " + property.memberOf + "." +
+				log.info("No public clear method for set " + property.memberOf + "." +
 						property.name + " in interface " + iface.getCanonicalName());
 		}
 		else {
@@ -1373,7 +1375,7 @@ public class TestGeneration
 
 		Method contains = findMethodForName(iface, methods.getContainsName());
 		if (contains == null) {
-			System.out.println("No public contains methods for " + property.memberOf + "." + property.name + 
+			log.info("No public contains methods for " + property.memberOf + "." + property.name +
 					" in interface " + iface.getCanonicalName());
 		}
 		else {
@@ -1394,7 +1396,7 @@ public class TestGeneration
 		
 		Method remove = findMethodForName(iface, methods.getRemoveName());
 		if (remove == null) {
-			System.out.println("No public remove method for property " + property.memberOf + "." + property.name + 
+			log.info("No public remove method for property " + property.memberOf + "." + property.name +
 					" for interface " + iface.getCanonicalName());
 		}
 		else {
@@ -1437,17 +1439,17 @@ public class TestGeneration
 		if (iface == null) return;
 
 		TypeData elementType = typeByName(((TypeDataVariableArray) typeData).elementType); 
-		System.out.println("*** VARIABLE ARRAY *** " + typeData.name + " with elements of type " + elementType.name + ".");
+		log.info("*** VARIABLE ARRAY *** " + typeData.name + " with elements of type " + elementType.name + ".");
 		
 		Method append = findMethodForName(iface, methods.getAppendName());
 		if (append == null) {
-			System.out.println("No public append method for array " + property.memberOf + "." + property.name + " in interface " + iface.getCanonicalName() + ".");
+			log.info("No public append method for array " + property.memberOf + "." + property.name + " in interface " + iface.getCanonicalName() + ".");
 			return;
 		}
 		
 		Method count = findMethodForName(iface, methods.getCountName());
 		if (count == null) {
-			System.out.println("No public count method for array " + property.memberOf + "." + property.name + " in interface " + iface.getCanonicalName() + ".");
+			log.info("No public count method for array " + property.memberOf + "." + property.name + " in interface " + iface.getCanonicalName() + ".");
 		}
  			
 		building.append("@Test");
@@ -1476,7 +1478,7 @@ public class TestGeneration
 					building.append("assertEquals(2, testValue." + count.getName() + "());");
 				break;
 			}
-			System.out.println("Need to find a way to test array elements for " + typeData.name + ".");
+			log.info("Need to find a way to test array elements for " + typeData.name + ".");
 			break;
 		case Int:
 			// TODO better support other types other than UInt32
@@ -1486,7 +1488,7 @@ public class TestGeneration
 				building.append("assertEquals(2, testValue." + count.getName() + "());");
 			break;
 		default:
-			System.out.println("Need to find a way to test array elements for " + typeData.name + ".");
+			log.info("Need to find a way to test array elements for " + typeData.name + ".");
 			break;
 		}
 		building.decrementNL("}");
@@ -1503,7 +1505,7 @@ public class TestGeneration
 		Method clear = findMethodForName(iface, methods.getClearName());
 		if (clear == null) {
 			if (property.isOptional == true)
-				System.out.println("No public clear method for array " + property.memberOf + "." +
+				log.info("No public clear method for array " + property.memberOf + "." +
 						property.name + " in interface " + iface.getCanonicalName());
 		}
 		else {
@@ -1537,7 +1539,7 @@ public class TestGeneration
 
 		Method prepend = findMethodForName(iface, methods.getPrependName());
 		if (prepend == null) {
-			System.out.println("No public prepend method for array " + property.memberOf + "." + property.name + 
+			log.info("No public prepend method for array " + property.memberOf + "." + property.name +
 					" in interface " + iface.getCanonicalName());
 		}
 		else {
@@ -1567,7 +1569,7 @@ public class TestGeneration
 						building.append("assertEquals(2, testValue." + count.getName() + "());");
 					break;
 				}
-				System.out.println("Need to find a way to test array elements for " + typeData.name + ".");
+				log.info("Need to find a way to test array elements for " + typeData.name + ".");
 				break;
 			case Int:
 				// TODO better support other types other than UInt32
@@ -1577,7 +1579,7 @@ public class TestGeneration
 					building.append("assertEquals(2, testValue." + count.getName() + "());");
 				break;
 			default:
-				System.out.println("Need to find a way to test array elements for " + typeData.name + ".");
+				log.info("Need to find a way to test array elements for " + typeData.name + ".");
 				break;
 			}
 			building.decrementNL("}");
@@ -1594,7 +1596,7 @@ public class TestGeneration
 
 		Method insertAt = findMethodForName(iface, methods.getInsertAtName());
 		if (insertAt == null) {
-			System.out.println("No public insert-at method for array " + property.memberOf + "." + property.name + 
+			log.info("No public insert-at method for array " + property.memberOf + "." + property.name +
 					" in interface " + iface.getCanonicalName());
 		}
 		else {
@@ -1624,7 +1626,7 @@ public class TestGeneration
 						building.append("assertEquals(2, testValue." + count.getName() + "());");
 					break;
 				}
-				System.out.println("Need to find a way to test array elements for " + typeData.name + ".");
+				log.info("Need to find a way to test array elements for " + typeData.name + ".");
 				break;
 			case Int:
 				// TODO better support other types other than UInt32
@@ -1634,7 +1636,7 @@ public class TestGeneration
 					building.append("assertEquals(2, testValue." + count.getName() + "());");
 				break;
 			default:
-				System.out.println("Need to find a way to test array elements for " + typeData.name + ".");
+				log.info("Need to find a way to test array elements for " + typeData.name + ".");
 				break;
 			}
 			building.decrementNL("}");
@@ -1665,7 +1667,7 @@ public class TestGeneration
 						building.append("assertEquals(2, testValue." + count.getName() + "());");
 					break;
 				}
-				System.out.println("Need to find a way to test array elements for " + typeData.name + ".");
+				log.info("Need to find a way to test array elements for " + typeData.name + ".");
 				break;
 			case Int:
 				// TODO better support other types other than UInt32
@@ -1675,7 +1677,7 @@ public class TestGeneration
 					building.append("assertEquals(2, testValue." + count.getName() + "());");
 				break;
 			default:
-				System.out.println("Need to find a way to test array elements for " + typeData.name + ".");
+				log.info("Need to find a way to test array elements for " + typeData.name + ".");
 				break;
 			}
 			building.decrementNL("}");
@@ -1702,7 +1704,7 @@ public class TestGeneration
 					building.append("testValue." + insertAt.getName() + "(2, testElement);");
 					break;
 				}
-				System.out.println("Need to find a way to test array elements for " + typeData.name + ".");
+				log.info("Need to find a way to test array elements for " + typeData.name + ".");
 				break;
 			case Int:
 				// TODO better support other types other than UInt32
@@ -1710,7 +1712,7 @@ public class TestGeneration
 				building.append("testValue." + insertAt.getName() + "(2, testElement);");
 				break;
 			default:
-				System.out.println("Need to find a way to test array elements for " + typeData.name + ".");
+				log.info("Need to find a way to test array elements for " + typeData.name + ".");
 				break;
 			}
 			building.decrementNL("}");
@@ -1737,7 +1739,7 @@ public class TestGeneration
 					building.append("testValue." + insertAt.getName() + "(-1, testElement);");
 					break;
 				}
-				System.out.println("Need to find a way to test array elements for " + typeData.name + ".");
+				log.info("Need to find a way to test array elements for " + typeData.name + ".");
 				break;
 			case Int:
 				// TODO better support other types other than UInt32
@@ -1745,7 +1747,7 @@ public class TestGeneration
 				building.append("testValue." + insertAt.getName() + "(-1, testElement);");
 				break;
 			default:
-				System.out.println("Need to find a way to test array elements for " + typeData.name + ".");
+				log.info("Need to find a way to test array elements for " + typeData.name + ".");
 				break;
 			}
 			building.decrementNL("}");
@@ -1762,7 +1764,7 @@ public class TestGeneration
 		
 		Method getAt = findMethodForName(iface, methods.getGetAtName());
 		if (getAt == null) {
-			System.out.println("No public get-at methods for array " + property.memberOf + "." + property.name + 
+			log.info("No public get-at methods for array " + property.memberOf + "." + property.name +
 					" in interface " + iface.getCanonicalName());
 		}
 		else {
@@ -1794,7 +1796,7 @@ public class TestGeneration
 					building.append("assertTrue(testElement.equals(testValue." + getAt.getName() + "(1)));");
 					break;
 				}
-				System.out.println("Need to find a way to test set elements for " + typeData.name + ".");
+				log.info("Need to find a way to test set elements for " + typeData.name + ".");
 				break;
 			case Int:
 				// TODO better support other types other than UInt32
@@ -1805,7 +1807,7 @@ public class TestGeneration
 				building.append("assertTrue(testElement == testValue." + getAt.getName() + "(1)));");
 				break;
 			default:
-				System.out.println("Need to find a way to test set elements for " + typeData.name + ".");
+				log.info("Need to find a way to test set elements for " + typeData.name + ".");
 				return;
 			}
 			building.decrementNL("}");
@@ -1839,7 +1841,7 @@ public class TestGeneration
 						building.append("assertTrue(testElement.equals(testValue." + getAt.getName() + "(0)));");
 						break;
 					}
-					System.out.println("Need to find a way to test array elements for " + typeData.name + ".");
+					log.info("Need to find a way to test array elements for " + typeData.name + ".");
 					break;
 				case Int:
 					// TODO better support other types other than UInt32
@@ -1850,7 +1852,7 @@ public class TestGeneration
 					building.append("assertTrue(testElement == testValue" + getAt.getName() + "(0)));");
 					break;
 				default:
-					System.out.println("Need to find a way to test array elements for " + typeData.name + ".");
+					log.info("Need to find a way to test array elements for " + typeData.name + ".");
 					break;
 				}
 				building.decrementNL("}");
@@ -1885,7 +1887,7 @@ public class TestGeneration
 						building.append("assertTrue(testElement.equals(testValue." + getAt.getName() + "(0)));");
 						break;
 					}
-					System.out.println("Need to find a way to test array elements for " + typeData.name + ".");
+					log.info("Need to find a way to test array elements for " + typeData.name + ".");
 					break;
 				case Int:
 					// TODO better support other types other than UInt32
@@ -1896,7 +1898,7 @@ public class TestGeneration
 					building.append("assertTrue(testElement == testValue." + getAt.getName() + "(0)));");
 					break;
 				default:
-					System.out.println("Need to find a way to test array elements for " + typeData.name + ".");
+					log.info("Need to find a way to test array elements for " + typeData.name + ".");
 					break;
 				}
 				building.decrementNL("}");
@@ -1929,7 +1931,7 @@ public class TestGeneration
 						building.append("assertTrue(testElement.equals(testValue." + getAt.getName() + "(1)));");					
 						break;
 					}
-					System.out.println("Need to find a way to test array elements for " + typeData.name + ".");
+					log.info("Need to find a way to test array elements for " + typeData.name + ".");
 					break;
 				case Int:
 					// TODO better support other types other than UInt32
@@ -1940,7 +1942,7 @@ public class TestGeneration
 					building.append("assertTrue(testElement.equals(testValue." + getAt.getName() + "(1)));");					
 					break;
 				default:
-					System.out.println("Need to find a way to test array elements for " + typeData.name + ".");
+					log.info("Need to find a way to test array elements for " + typeData.name + ".");
 					break;
 				}
 				building.decrementNL("}");
@@ -1963,7 +1965,7 @@ public class TestGeneration
 	
 		Method removeAt = findMethodForName(iface, methods.getRemoveAtName());
 		if (removeAt == null) {
-			System.out.println("No public remove-at method for array " + property.name + "." + property.memberOf + 
+			log.info("No public remove-at method for array " + property.name + "." + property.memberOf +
 					" in interface " + iface.getCanonicalName());
 		}
 		else {

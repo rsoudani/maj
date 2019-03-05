@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import lombok.extern.slf4j.Slf4j;
 import tv.amwa.maj.industry.MetadataObject;
 import tv.amwa.maj.io.mxf.HeaderMetadata;
 import tv.amwa.maj.io.mxf.MXFBuilder;
@@ -32,7 +33,7 @@ import tv.amwa.maj.io.xml.XMLBuilder;
 import tv.amwa.maj.model.Preface;
 import tv.amwa.maj.model.impl.PrefaceImpl;
 import tv.amwa.maj.record.impl.AUIDImpl;
-
+@Slf4j
 public class HeaderMetadataImpl
 	implements
 		HeaderMetadata,
@@ -174,11 +175,11 @@ public class HeaderMetadataImpl
 					preface = (PrefaceImpl) metadataFromFile;
 
 //				 if (metadataFromFile != null)
-//					System.out.println(XMLBuilder.toXML(metadataFromFile));
+//					log.info(XMLBuilder.toXML(metadataFromFile));
 			}
 		}
 		catch (Exception e) {
-			System.err.println(e.getClass().getName() + " thrown when reading a preface: " + e.getMessage());
+			log.warn(e.getClass().getName() + " thrown when reading a preface: " + e.getMessage());
 		}
 
 		setEndPadding(lastFillSize);

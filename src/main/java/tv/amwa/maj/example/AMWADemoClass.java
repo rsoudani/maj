@@ -56,6 +56,7 @@ package tv.amwa.maj.example;
  */
 
 
+import lombok.extern.slf4j.Slf4j;
 import tv.amwa.maj.industry.Forge;
 import tv.amwa.maj.industry.MediaEngine;
 import tv.amwa.maj.model.*;
@@ -72,6 +73,7 @@ import tv.amwa.maj.model.*;
  *
  *
  */
+@Slf4j
 public class AMWADemoClass 
 	implements tv.amwa.maj.constant.CommonConstants {
 
@@ -111,6 +113,6 @@ public class AMWADemoClass
 	    amwaPackage.appendPackageTrack(amwaVideoTrack);
 	    amwaPackage.appendPackageUserComment("company", "portability 4 media");
 
-	    System.out.println(amwaPackage.toString());
+	    log.info(amwaPackage.toString());
 	}
 }

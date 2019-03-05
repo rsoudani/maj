@@ -24,6 +24,8 @@
 
 package tv.amwa.maj.util;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -38,7 +40,7 @@ import java.util.regex.Pattern;
  * 
  * @see tv.amwa.maj.constant.RP224
  */
-
+@Slf4j
 public class RP224ToJava {
 
 	final static String ofInterest = ",([^,]*|\"[^\"]*\")";
@@ -60,7 +62,7 @@ public class RP224ToJava {
 			String[] args) {
 		
 		if (args.length != 1) {
-			System.err.println("RP224 spreadsheet expected as input.");
+			log.warn("RP224 spreadsheet expected as input.");
 			System.exit(1);
 		}
 
@@ -78,12 +80,12 @@ public class RP224ToJava {
 			
 			reader = new BufferedReader(new FileReader(rp224File));
 		
-			System.out.println("package tv.amwa.maj.constant;\n");
+			log.info("package tv.amwa.maj.constant;\n");
 			
-			System.out.println("import tv.amwa.maj.record.AUID;");
-			System.out.println("import tv.amwa.maj.industry.Forge;\n");
+			log.info("import tv.amwa.maj.record.AUID;");
+			log.info("import tv.amwa.maj.industry.Forge;\n");
 			
-			System.out.println("public interface RP224 {\n");
+			log.info("public interface RP224 {\n");
 			
 			for ( String currentLine = reader.readLine() ;
 					currentLine != null;
@@ -94,29 +96,29 @@ public class RP224ToJava {
 					
 					if (matcher.group(3).length() == 0) continue;
 					
-					System.out.println("    /**");
-					System.out.println("     * <p>" + matcher.group(4) + ".</p>");
-					System.out.println("     */");
+					log.info("    /**");
+					log.info("     * <p>" + matcher.group(4) + ".</p>");
+					log.info("     */");
 					
-					System.out.println("    public final static AUID " + toJavaName(matcher.group(4)) + " = Forge.makeAUID(");
+					log.info("    public final static AUID " + toJavaName(matcher.group(4)) + " = Forge.makeAUID(");
 					
 					Matcher id1Matcher = idPattern.matcher(matcher.group(1));
 					id1Matcher.matches();
 					Matcher id2Matcher = idPattern.matcher(matcher.group(2));
 					id2Matcher.matches();
 					
-					System.out.println("            0x" + id2Matcher.group(1) + id2Matcher.group(2) + id2Matcher.group(3) + id2Matcher.group(4) + 
+					log.info("            0x" + id2Matcher.group(1) + id2Matcher.group(2) + id2Matcher.group(3) + id2Matcher.group(4) +
 							", (short) 0x" + id2Matcher.group(5) + id2Matcher.group(6) + 
 							", (short) 0x" + id2Matcher.group(7) + id2Matcher.group(8) + ",");
 					System.out.print("            new byte[] { ");
 					for ( int x = 1 ; x < 8 ; x++ )
 						System.out.print("0x" + id1Matcher.group(x) + ", ");
-					System.out.println("0x" + id1Matcher.group(8) + " } );\n");
+					log.info("0x" + id1Matcher.group(8) + " } );\n");
 				}
 
 			}
 
-			System.out.println("}\n");
+			log.info("}\n");
 		}
 		catch (Exception e) {
 			e.printStackTrace();

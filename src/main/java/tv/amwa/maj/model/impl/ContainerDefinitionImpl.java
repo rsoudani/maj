@@ -138,7 +138,7 @@ public class ContainerDefinitionImpl
 				if (containerMetadata.description().length() > 0)
 					definedContainer.setDescription(containerMetadata.description());
 		
-				// System.out.println(definedContainer.toString());
+				// log.info(definedContainer.toString());
 				
 				registerContainerDefinition(definedContainer);
 			

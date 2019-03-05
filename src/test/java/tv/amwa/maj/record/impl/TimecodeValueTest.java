@@ -211,7 +211,7 @@ public class TimecodeValueTest {
 		
 		tv.amwa.maj.record.TimeStruct zeroTime =
 			zero.convertToRealTime();
-		// System.out.println(zeroTime.toString());
+		// log.info(zeroTime.toString());
 		assertTrue(zeroTime.toString().startsWith("00:00:00"));
 		
 		tv.amwa.maj.record.TimeStruct random1Time =
@@ -235,7 +235,7 @@ public class TimecodeValueTest {
 		
 		for ( int key : dropTestMap.keySet() ) {
 			TimecodeValueImpl testValue = new TimecodeValueImpl(true, (long) key, (short) 30);
-			// System.out.println(dropTestMap.get(key) + " " + testValue.toString());
+			// log.info(dropTestMap.get(key) + " " + testValue.toString());
 			assertEquals(dropTestMap.get(key), testValue.toString());
 		}
 	}
@@ -264,14 +264,14 @@ public class TimecodeValueTest {
 //			assertEquals(0, hourNonDrop.compareTo(hourDrop));
 //			assertEquals(0, hourDrop.compareTo(hourNonDrop));
 //
-//			// System.out.println(hourNonDrop.getStartOffset() + ", " + hourDrop.getStartOffset());
+//			// log.info(hourNonDrop.getStartOffset() + ", " + hourDrop.getStartOffset());
 //		}
 //	}
 	
 	@Ignore @Test public void toXML() { // FIXME make this test run on Windows
 		
 		String asXML = XMLBuilder.toXMLNonMetadata(random1);
-		// System.out.println(asXML);
+		// log.info(asXML);
 		
 		String expectedEnding = "<aaf:TimecodeValue xmlns:aaf=\"http://www.smpte-ra.org/schemas/2001-2/2007/aaf\">\n" +
 				"  <aaf:StartTimecode>55359</aaf:StartTimecode>\n" +

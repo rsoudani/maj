@@ -187,7 +187,7 @@ public class CodecDefinitionImpl
 				if (codecMetadata.description().length() > 0)
 					definedCodec.setDescription(codecMetadata.description());
 		
-				// System.out.println(definedCodec.toString());
+				// log.info(definedCodec.toString());
 				
 				registerCodecDefinition(definedCodec);
 			

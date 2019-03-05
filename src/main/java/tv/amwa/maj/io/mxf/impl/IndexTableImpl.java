@@ -27,6 +27,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import lombok.extern.slf4j.Slf4j;
 import tv.amwa.maj.exception.PropertyNotPresentException;
 import tv.amwa.maj.industry.MetadataObject;
 import tv.amwa.maj.integer.UInt32;
@@ -47,6 +48,7 @@ import tv.amwa.maj.record.Rational;
 import tv.amwa.maj.record.impl.AUIDImpl;
 import tv.amwa.maj.record.impl.RationalImpl;
 
+@Slf4j
 public class IndexTableImpl
 	implements
 		IndexTable,
@@ -128,7 +130,7 @@ public class IndexTableImpl
 				indexTable.addSegment(nextSegment);
 			}
 			catch (Exception e) {
-				System.err.println(e.getClass().getName() + " thrown when trying to read an index table segment: " + e.getMessage());
+				log.warn(e.getClass().getName() + " thrown when trying to read an index table segment: " + e.getMessage());
 			}
 			finally {
 				buffer.limit(preserveLimit);

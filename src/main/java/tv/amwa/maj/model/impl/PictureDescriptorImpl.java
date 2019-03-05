@@ -65,6 +65,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import tv.amwa.maj.enumeration.AlphaTransparencyType;
 import tv.amwa.maj.enumeration.FieldNumber;
 import tv.amwa.maj.enumeration.LayoutType;
@@ -91,7 +92,7 @@ import tv.amwa.maj.record.impl.RationalImpl;
  *
  *
  */
-
+@Slf4j
 @MediaClass(uuid1 = 0x0d010101, uuid2 = 0x0101, uuid3 = 0x2700,
 		  uuid4 = {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x06, 0x01, 0x01},
 		  definedName = "PictureDescriptor",
@@ -975,7 +976,7 @@ public class PictureDescriptorImpl
 		if (videoLineMap == null)
 			throw new NullPointerException("Cannot set the video line map of this picture descriptor using a null value.");
 		if ((videoLineMap.size() == 0) || (videoLineMap.size() > 2))
-			System.err.println("The size of the video line map should be 1 or 2 for this picture descriptor and was set to length " + videoLineMap.size() + " from a stream.");
+			log.warn("The size of the video line map should be 1 or 2 for this picture descriptor and was set to length " + videoLineMap.size() + " from a stream.");
 	
 		this.videoLineMap = new int[videoLineMap.size()];
 		

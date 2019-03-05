@@ -54,6 +54,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -70,6 +71,7 @@ import tv.amwa.maj.model.impl.IdentificationImpl;
  * 
  *
  */
+@Slf4j
 public class XMLFactory {
 	
 	public final static Preface readPreface(
@@ -152,7 +154,7 @@ public class XMLFactory {
 	public final static void main(String args[]) {
 		
 		if (args.length == 0) {
-			System.out.println("Usage: java tv.amwa.maj.io.xml.XMLFactory <reg_xml_file>");
+			log.info("Usage: java tv.amwa.maj.io.xml.XMLFactory <reg_xml_file>");
 			System.exit(1);
 		}
 
@@ -163,10 +165,10 @@ public class XMLFactory {
 					IdentificationImpl.APIProductName,
 					IdentificationImpl.APIProductVersionString,
 					IdentificationImpl.APIProductID));
-			System.out.println(header.toString());
+			log.info(header.toString());
 		}
 		catch (Exception e) {
-			System.out.println(e.getMessage());
+			log.info(e.getMessage());
 			e.printStackTrace();
 		}
 	}

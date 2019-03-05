@@ -317,7 +317,7 @@ public final class TypeDefinitionIntegerImpl
 		if (value == null)
 			throw new NullPointerException("Cannot create an integer property value using a null value.");
 		
-		// System.out.println("value: " + value.longValue() + " minValue: " + minValue() + " maxValue: " + maxValue()); 
+		// log.info("value: " + value.longValue() + " minValue: " + minValue() + " maxValue: " + maxValue());
 		
 		if ((value.longValue() < minValue()) || (value.longValue() > maxValue()))
 			throw new IllegalArgumentException("The given number is outside the acceptable range for a " + (isSigned ? "signed" : "unsigned") + " integer value of " + size + " byte(s).");

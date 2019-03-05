@@ -87,6 +87,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -131,7 +132,7 @@ import tv.amwa.maj.record.AUID;
  * @see MediaPropertyContains
  * @see MediaPropertyClear
  */
-
+@Slf4j
 @MediaClass(uuid1 = 0x0d010101, uuid2 = 0x020a, uuid3 = 0x0000,
 		  uuid4 = {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x06, 0x01, 0x01},
 		  definedName = "TypeDefinitionSet",
@@ -739,7 +740,7 @@ public final class TypeDefinitionSetImpl
 					setValue.add(referenceMap.get(unresolvedReference.getValue()));
 				}
 				else {
-					System.err.println("Unable to resolve reference " + unresolvedReference.getValue().toString() +
+					log.warn("Unable to resolve reference " + unresolvedReference.getValue().toString() +
 							" for a set.");
 					allResolved = false;
 				}

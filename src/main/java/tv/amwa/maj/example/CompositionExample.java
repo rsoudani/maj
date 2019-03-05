@@ -18,6 +18,7 @@
 
 package tv.amwa.maj.example;
 
+import lombok.extern.slf4j.Slf4j;
 import tv.amwa.maj.constant.OperationConstant;
 import tv.amwa.maj.constant.ParameterConstant;
 import tv.amwa.maj.constant.TransferCharacteristicType;
@@ -79,6 +80,7 @@ import tv.amwa.maj.model.Transition;
  *
  *
  */
+@Slf4j
 public class CompositionExample {
 
 	/**
@@ -92,7 +94,7 @@ public class CompositionExample {
 			String args[]) {
 
 		if (args.length == 0) {
-			System.err.println(
+			log.warn(
 					"Example composition generator: java tv.amwa.maj.example.CompositionExample <filename(.aaf/.isr/.xml)>");
 			System.exit(1);
 		}
@@ -112,7 +114,7 @@ public class CompositionExample {
 			}
 		}
 		catch (Exception e) {
-			System.err.println(e.getMessage());
+			log.warn(e.getMessage());
 			e.printStackTrace();
 			System.exit(1);
 		}

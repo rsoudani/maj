@@ -68,6 +68,7 @@ import java.util.Vector;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -201,6 +202,7 @@ import tv.amwa.maj.record.AUID;
  *
  *
  */
+@Slf4j
 public class AutoGeneration 
 	extends GenerationCore {
 	
@@ -212,7 +214,7 @@ public class AutoGeneration
 			String[] args) {
 
 		if (args.length < 2) {
-			System.out.println("Usage: java tv.amwa.maj.util.AutoGeneration <base_package_name> <metadictionary_XML_file>");
+			log.info("Usage: java tv.amwa.maj.util.AutoGeneration <base_package_name> <metadictionary_XML_file>");
 			System.exit(1);
 		}
 		
@@ -228,18 +230,18 @@ public class AutoGeneration
 				context = processRoot(node);
 			}
 			else{
-				System.out.println("File not found!");
+				log.info("File not found!");
 			}	
 		}
 		catch(Exception e){
-			System.err.println(e.getClass().getName() + " thrown: " + e.getMessage());
+			log.warn(e.getClass().getName() + " thrown: " + e.getMessage());
 			e.printStackTrace();
 		}
 		
 		context.basePackageName = args[0];
 		
 		if (makeDirectories(context) == false) {
-			System.out.println("Unable to create the required directory structure.");
+			log.info("Unable to create the required directory structure.");
 			System.exit(1);
 		}
 		
@@ -300,9 +302,9 @@ public class AutoGeneration
 				generateFactory(context));
 		
 		if (success)
-			System.out.println("Successfully generated all files for package " + context.basePackageName + ".");
+			log.info("Successfully generated all files for package " + context.basePackageName + ".");
 		else
-			System.out.println("Problem encountered generating files for package " + context.basePackageName + ".");
+			log.info("Problem encountered generating files for package " + context.basePackageName + ".");
 	}
 
 	static String generateInterface(
@@ -2094,7 +2096,7 @@ public class AutoGeneration
 				building.decrement("}");
 				building.addImport("tv.amwa.maj.exception.BadParameterException");
 				building.append("catch (BadParameterException bpe) {");
-				building.increment("System.err.println(\"A stored identifier is not registered for extendible enumeration " + 
+				building.increment("log.warn(\"A stored identifier is not registered for extendible enumeration " +
 						camelToWords(elementType.name) + ".\");");
 				building.append("return null;");
 				building.decrement("}");
@@ -2488,7 +2490,7 @@ public class AutoGeneration
 						typeData.name + ".class);");
 				building.append("}");
 				building.append("catch (Exception e) {");
-				building.append("    System.err.println(\"Unable to register items for extendible enumeration " + 
+				building.append("    log.warn(\"Unable to register items for extendible enumeration " +
 						typeData.name + ".\");");
 				building.appendNL("}");
 			}

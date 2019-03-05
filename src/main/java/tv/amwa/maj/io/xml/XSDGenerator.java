@@ -33,6 +33,7 @@ import java.util.Set;
 
 import javax.xml.XMLConstants;
 
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
@@ -71,6 +72,7 @@ import tv.amwa.maj.meta.TypeDefinitionWeakObjectReference;
  * 
  * @see MetaDictionaryGenerator
  */
+@Slf4j
 public class XSDGenerator 
 	implements CommonConstants {
 
@@ -1491,7 +1493,7 @@ public class XSDGenerator
 	public final static void main(
 			String args[]) {
 		
-		System.out.println(generateBaselineXSDAsAString());
+		log.info(generateBaselineXSDAsAString());
 	}
 	
 }
